@@ -52,9 +52,9 @@ User can filter the chart to view their transaction within 12 months.
   ![Add Category](images/addcate.png)
 
 - When user want to delete a Category, they can transfer their transaction to other category, else the transaction data will be deleted.
-Choose Data to transfer
+  - Choose Data to transfer
   ![Transfer](images/Transfercate.png)
-Choose Category to transfer the data
+  - Choose Category to transfer the data
   ![Transfer1](images/transfercate1.png)
 
 ---
@@ -82,5 +82,8 @@ Choose Category to transfer the data
     # Start the frontend  
     cd ../client  
     npm run dev
- ---
+
+---
 🌟 Thank you!
+
+
