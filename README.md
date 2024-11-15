@@ -82,12 +82,5 @@ Choose Category to transfer the data
     # Start the frontend  
     cd ../client  
     npm run dev
- 
-
-
-
-  
-
-
-
-
+ ---
+🌟 Thank you!
