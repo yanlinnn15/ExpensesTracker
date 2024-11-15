@@ -17,6 +17,13 @@ A web application to help users manage and track their personal expenses. The tr
 - Styling: CSS and Material UI
 ---
 # Application Screenshots
+1. User Authentication (Login, Sign Up, Verification, Forgot Password)
+![Login](images/Login.png)
+![Sign Up](images/Signup.png)
+
+2. Dashboard
+![Dashboard](images/dashboard.png)
+
 
 
 
