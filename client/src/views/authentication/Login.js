@@ -1,33 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Grid, Box, Card, Stack, Typography, Button } from '@mui/material';
+import { Grid, Box, Card, Stack, Typography, Button, CircularProgress } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import Logo from 'src/layouts/full/shared/logo/Logo';
 import { Google as GoogleIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { showToast } from '../../helpers/showtoast';
 
 const Login2 = () => {
+  const [loading, setLoading] = useState({ google: false, guest: false });
+  const navigate = useNavigate();
+
   const handleGoogleLogin = () => {
+    setLoading(prev => ({ ...prev, google: true }));
     // Redirect to backend Google OAuth route
     window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   };
 
   const handleGuestLogin = async () => {
+    setLoading(prev => ({ ...prev, guest: true }));
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/guest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Important for cookies
       });
 
       const data = await response.json();
-      if (data.token) {
+      if (response.ok && data.token) {
         localStorage.setItem('accessToken', data.token);
-        // Redirect to dashboard
-        window.location.href = '/dashboard';
+        showToast('Welcome! You are logged in as a guest', 'success');
+        navigate('/dashboard');
+      } else {
+        throw new Error(data.message || 'Failed to login as guest');
       }
     } catch (error) {
       console.error('Guest login error:', error);
+      showToast(error.message || 'Failed to login as guest. Please try again.', 'error');
+    } finally {
+      setLoading(prev => ({ ...prev, guest: false }));
     }
   };
   
@@ -67,13 +80,17 @@ const Login2 = () => {
                     <Typography variant="h3" textAlign="center" mb={2}>
                       Welcome to Expense Tracker
                     </Typography>
+                    <Typography variant="body2" color="textSecondary" textAlign="center" mb={3}>
+                      Track your expenses, manage your budget, and reach your financial goals
+                    </Typography>
                   </Box>
                   
                   <Button
                     fullWidth
                     variant="contained"
-                    startIcon={<GoogleIcon />}
+                    startIcon={loading.google ? <CircularProgress size={20} color="inherit" /> : <GoogleIcon />}
                     onClick={handleGoogleLogin}
+                    disabled={loading.google || loading.guest}
                     sx={{
                       backgroundColor: '#4285F4',
                       color: 'white',
@@ -82,15 +99,17 @@ const Login2 = () => {
                       },
                     }}
                   >
-                    Continue with Google
+                    {loading.google ? 'Connecting...' : 'Continue with Google'}
                   </Button>
 
                   <Button
                     fullWidth
                     variant="outlined"
                     onClick={handleGuestLogin}
+                    disabled={loading.google || loading.guest}
+                    startIcon={loading.guest && <CircularProgress size={20} />}
                   >
-                    Continue as Guest
+                    {loading.guest ? 'Creating guest account...' : 'Continue as Guest'}
                   </Button>
 
                   <Typography variant="caption" color="text.secondary" align="center">
