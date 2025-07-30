@@ -44,7 +44,7 @@ export default defineConfig({
         },
     },
     build: {
-        outDir: 'build',
+        outDir: 'dist', // Changed from 'build' to 'dist'
         rollupOptions: {
             output: {
                 manualChunks: {
