@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import fs from 'fs/promises';
 import svgr from '@svgr/rollup';
-//npm import svgr from 'vite-plugin-svgr'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,36 +10,48 @@ export default defineConfig({
         alias: {
             src: resolve(__dirname, 'src'),
         },
+        extensions: ['.js', '.jsx', '.json'],
     },
-    esbuild: {
-        loader: 'jsx',
-        include: /src\/.*\.jsx?$/,
-        exclude: [],
-    },
+    plugins: [
+        react({
+            include: '**/*.{jsx,js}',
+            babel: {
+                plugins: ['@babel/plugin-transform-react-jsx'],
+            },
+        }),
+        svgr(),
+    ],
     optimizeDeps: {
+        include: ['@mui/icons-material'],
         esbuildOptions: {
+            loader: {
+                '.js': 'jsx',
+            },
             plugins: [
                 {
                     name: 'load-js-files-as-jsx',
                     setup(build) {
-                        build.onLoad(
-                            { filter: /src\\.*\.js$/ },
-                            async (args) => ({
+                        build.onLoad({ filter: /src\\.*\.js$/ }, async (args) => {
+                            const contents = await fs.readFile(args.path, 'utf8');
+                            return {
                                 loader: 'jsx',
-                                contents: await fs.readFile(args.path, 'utf8'),
-                            })
-                        );
+                                contents,
+                            };
+                        });
                     },
                 },
             ],
         },
     },
-
-
-    
-    // plugins: [react(),svgr({
-    //   exportAsDefault: true
-    // })],
-
-    plugins: [svgr(), react()],
+    build: {
+        outDir: 'build',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom'],
+                    mui: ['@mui/material', '@mui/icons-material'],
+                },
+            },
+        },
+    },
 });

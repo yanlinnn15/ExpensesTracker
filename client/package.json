@@ -13,6 +13,7 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.15.12",
     "@mui/lab": "5.0.0-alpha.133",
     "@mui/material": "^5.13.4",
     "@mui/system": "^5.14.11",
@@ -36,6 +37,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
     "@types/react": "^18.2.15",
     "@vitejs/plugin-react": "^4.0.3",
     "eslint": "^8.45.0",
