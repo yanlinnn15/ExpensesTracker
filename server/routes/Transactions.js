@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {Transactions, Categories, Icons} = require("../models");
+const {Transactions, Categories, Icons, Users} = require("../models");
 const {validateToken} = require("../middlewares/authMW");
 const Joi = require("joi");
 const { Op, fn, col } = require('sequelize');
@@ -28,6 +28,11 @@ const ESchema = Joi.object({
 router.post("/", validateToken, async (req,res) => {
     const transaction = req.body;
     const uid = req.user.id;
+    
+    // Get user info to determine transaction type
+    const user = await Users.findByPk(uid);
+    transaction.createdByGuest = user.isGuest;
+    transaction.createdByGoogle = !!user.googleId;
     const {error, value} = ESchema.validate(transaction);
 
     if (error) 

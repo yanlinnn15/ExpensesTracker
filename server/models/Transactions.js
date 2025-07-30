@@ -1,22 +1,31 @@
 module.exports = (sequelize, DataTypes) => {
 
     const Transactions = sequelize.define("Transactions", {
-
-        date:{
+        date: {
             type: DataTypes.DATEONLY,
             allowNull: false
         },
-        amount:{
+        amount: {
             type: DataTypes.DECIMAL(20,2),
             allowNull: false
         },
-        type:{
+        type: {
             type: DataTypes.BOOLEAN,
-            allowNull:false,
+            allowNull: false,
         },
-        remark:{
+        remark: {
             type: DataTypes.STRING,
-            allowNull:true
+            allowNull: true
+        },
+        createdByGuest: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        createdByGoogle: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         }
   
 

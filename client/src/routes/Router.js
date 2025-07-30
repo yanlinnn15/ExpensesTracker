@@ -61,6 +61,10 @@ const Router = [
       { path: '/auth/resetpass', element: <ResetPass /> },
       { path: '/auth/verify/', element: <Verify /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
+      {
+        path: "/auth/google-callback",
+        element: <GoogleCallback />
+      },
     ],
   },
 ];

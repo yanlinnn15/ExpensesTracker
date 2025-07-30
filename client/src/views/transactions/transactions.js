@@ -25,6 +25,7 @@ import getLast12Months from '../func/func12m';
 import PageContainer from 'src/components/container/PageContainer';
 import DashboardCard from '../../components/shared/DashboardCard';
 import axios from 'axios';
+import API_URL from '../../config/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AddTransactionModal from './addtrans';
 import EditTrans from './edittrans';
@@ -73,7 +74,7 @@ const Transactions = () => {
     const handleExpenseAdded = (newTransaction) => {
         const yearMonth = newTransaction.date.slice(0, 7);
         setSelectedDate(yearMonth);
-        axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+        axios.get(`${API_URL}/trans/viewAll?mth=${selectedDate}`, {
             headers: {
                 accessToken: localStorage.getItem("accessToken"),
             }
@@ -177,7 +178,7 @@ const Transactions = () => {
             navigation('/auth/login');
         } else {
 
-            axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+            axios.get(`${API_URL}/trans/viewAll?mth=${selectedDate}`, {
                 headers: {
                     accessToken: localStorage.getItem("accessToken"),
                 }

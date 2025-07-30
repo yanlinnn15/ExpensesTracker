@@ -18,5 +18,6 @@ module.exports = {
   production: {
     url: process.env.MYSQL_URL,
     dialect: "mysql"
-  }
+  },
+  frontend_url: process.env.FRONTEND_URL || 'http://localhost:5173'
 };

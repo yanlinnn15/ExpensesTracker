@@ -3,46 +3,37 @@ const { verify } = require("jsonwebtoken");
 module.exports = (sequelize, DataTypes) => {
 
     const Users = sequelize.define("Users", {
-
         fName: {
-            type:DataTypes.STRING,
-            allowNull:false
+            type: DataTypes.STRING,
+            allowNull: false
         },
         lName: {
             type: DataTypes.STRING,
-            allowNull:false
+            allowNull: false
         },
-        email:{
+        email: {
             type: DataTypes.STRING,
-            allowNull:false
+            allowNull: false
         },
-        password:{
+        googleId: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true
         },
-        active:{
+        isGuest: {
             type: DataTypes.BOOLEAN,
-            defaultValue:1,
+            defaultValue: false
         },
-        verify:{
+        active: {
             type: DataTypes.BOOLEAN,
-            defaultValue:0,
+            defaultValue: true
         },
-        verifyToken:{
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        verifyTokenEx:{
+        lastActive: {
             type: DataTypes.DATE,
-            allowNull:true
+            defaultValue: DataTypes.NOW
         },
-        resetToken:{
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        resetTokenEx:{
+        registeredAt: {
             type: DataTypes.DATE,
-            allowNull:true
+            defaultValue: DataTypes.NOW
         },
 
     });
