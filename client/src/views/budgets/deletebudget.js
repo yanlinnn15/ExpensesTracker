@@ -4,6 +4,7 @@ import { IconSquareRoundedX } from '@tabler/icons-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { showsweetAlert } from '../../helpers/alert';
+import API_URL from '../../config/api';
 
 const style = {
     position: 'absolute',
@@ -39,7 +40,7 @@ function DeleteBudget({ open, onClose, onBudgetDeleted, budgetID }) {
     const handleDelete = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.delete(`http://localhost:3001/budget/dlt/${budgetID}`, {
+            const response = await axios.delete(`${API_URL}/budget/dlt/${budgetID}`, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             });
             onBudgetDeleted(budgetID); 

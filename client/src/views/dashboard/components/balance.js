@@ -5,6 +5,7 @@ import DashboardCard from '../../../components/shared/DashboardCard';
 import getLast12Months from '../../func/func12m';
 import axios from 'axios';
 import * as TablerIcons from "@tabler/icons-react"; 
+import API_URL from '../../../config/api';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -32,7 +33,7 @@ const BalanceOverview = () => {
     if (!localStorage.getItem("accessToken")) {
       navigate('/auth/login');
     } else {
-      axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+      axios.get(`${API_URL}/trans/viewAll?mth=${selectedDate}`, {
         headers: { accessToken: localStorage.getItem("accessToken") }
       })
       .then((response) => {

@@ -3,6 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, M
 import { IconSquareRoundedX } from '@tabler/icons-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../../config/api';
 
 const style = {
     position: 'absolute',
@@ -42,7 +43,7 @@ function DeleteTrans({ open, onClose, onTransactionDeleted, transactionId }) {
     const handleDelete = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.delete(`http://localhost:3001/trans/dlt/${transactionId}`, {
+            const response = await axios.delete(`${API_URL}/trans/dlt/${transactionId}`, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             });
             onTransactionDeleted(transactionId); 

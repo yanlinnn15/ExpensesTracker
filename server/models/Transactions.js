@@ -16,19 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         remark: {
             type: DataTypes.STRING,
             allowNull: true
-        },
-        createdByGuest: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
-        createdByGoogle: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
         }
-  
-
     });
 
     Transactions.associate = (models) => {

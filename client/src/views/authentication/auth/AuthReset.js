@@ -14,6 +14,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import CustomTextField from '../../../components/forms/theme-elements/CustomTextField';
 import ErrorImg from 'src/assets/images/backgrounds/404-error-idea.gif';
 import { showsweetAlert } from '../../../helpers/alert';
+import API_URL from '../../../config/api';
 
 function AuthReset({ title, subtitle }) {
     const [password, setPassword] = useState("");
@@ -32,7 +33,7 @@ function AuthReset({ title, subtitle }) {
 
     useEffect(() => {
         if (token && id) {
-            axios.post(`http://localhost:3001/auth/validate-reset-token?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`)
+            axios.post(`${API_URL}/auth/validate-reset-token?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`)
                 .then(response => {
                     setMsg(response.data.message);
                 })
@@ -85,7 +86,7 @@ function AuthReset({ title, subtitle }) {
 
         const data = { password, confirmPassword };
         try{
-            const response = await axios.post(`http://localhost:3001/auth/forgotpass?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`, data);
+            const response = await axios.post(`${API_URL}/auth/forgotpass?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`, data);
             const { message } = response.data;
             showsweetAlert('Success!', message, 'success');
             navigate('/auth/login');

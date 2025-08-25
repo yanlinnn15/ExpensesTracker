@@ -6,6 +6,7 @@ import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';  
 import { useNavigate } from 'react-router-dom'; 
+import API_URL from '../../config/api';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -38,14 +39,15 @@ const initialValues = {
   remark: '',
   CategoryId: '',
   date: today,
-  type: true
+  type: true  // true for income
 };
 
 const validationSchema = Yup.object({
   amount: Yup.number().required('Required').min(0.1, 'Must be at least 0.1'),
   remark: Yup.string().optional(),
-  CategoryId: Yup.string().required('Required'),
+  CategoryId: Yup.number().required('Required').positive('Must be a valid category'),
   date: Yup.date().required('Required'),
+  type: Yup.boolean().required('Required')
 });
 
 function AddIncome({ open, onClose, getIncomes }) {
@@ -62,7 +64,7 @@ function AddIncome({ open, onClose, getIncomes }) {
     if (!localStorage.getItem("accessToken")) {
       navigate("/auth/login");  
     } else {
-      axios.get("http://localhost:3001/cate/viewAll", {
+      axios.get(`${API_URL}/cate/viewAll`, {
         headers: { accessToken: localStorage.getItem("accessToken") }
       }).then((response) => {
         if (response.data) {
@@ -76,11 +78,28 @@ function AddIncome({ open, onClose, getIncomes }) {
     }
   }, [navigate]);
 
-  const onSubmit = (data) => {    
-    axios.post("http://localhost:3001/trans/", data, {
-        headers: { accessToken: localStorage.getItem("accessToken") }
+    const onSubmit = (data) => {    
+    // Prepare transaction data - only send required fields
+    const transactionData = {
+      amount: Number(data.amount),
+      CategoryId: Number(data.CategoryId),
+      date: data.date,
+      remark: data.remark || "",
+      type: true // Force type to be true for income
+    };
+
+    // Log the request for debugging
+    console.log('Client sending transaction:', transactionData);
+    console.log('Request URL:', `${API_URL}/trans/`);
+    console.log('Access Token:', localStorage.getItem("accessToken"));
+    
+    axios.post(`${API_URL}/trans`, transactionData, {
+        headers: { 
+          accessToken: localStorage.getItem("accessToken"),
+          'Content-Type': 'application/json'
+        }
     }).then((response) => {
-        console.log("Server response:", response.data);
+        console.log('Server responded:', response.data);
         
         if (response.data && response.data.trans) {
             const category = cate.find(c => c.id === data.CategoryId);
@@ -97,7 +116,8 @@ function AddIncome({ open, onClose, getIncomes }) {
         }
     }).catch((error) => {
         console.error("Error submitting income:", error);
-        const message = error.response ? error.response.data.message : error.message;
+        console.log("Error response:", error.response?.data); // Log the full error response
+        const message = error.response?.data?.error || error.response?.data?.message || error.message;
         setDialogMessage(message);
         setDialogOpen(true);
     });
@@ -141,8 +161,19 @@ function AddIncome({ open, onClose, getIncomes }) {
                   label="Category"
                   labelId="CategoryId"
                   variant="outlined"
-                  disabledEmpty
+                  displayEmpty
                   error={touched.CategoryId && !!errors.CategoryId}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    handleChange({
+                      ...e,
+                      target: {
+                        ...e.target,
+                        name: 'CategoryId',
+                        value: value
+                      }
+                    });
+                  }}
                 >
                   {cate.map((cat) => (
                     <MenuItem key={cat.id} value={cat.id}>

@@ -15,7 +15,7 @@ import EditCate from './editcate';
 import AddCate from './addcate';
 import DeleteCate from './dltcate';
 import { showToast } from '../../helpers/showtoast';
-
+import API_URL from '../../config/api';
 
 const renderIcon = (iconName) => {
     const IconComponent = TablerIcons[iconName]; 
@@ -45,7 +45,7 @@ const Categories = () => {
           navigator('/auth/login');
           return;
         }
-        axios.get("http://localhost:3001/cate/viewAll", {
+        axios.get(`${API_URL}/cate/viewAll`, {
             headers: { accessToken },
           })
           .then((response) => {
@@ -60,7 +60,7 @@ const Categories = () => {
       }, [navigator]);
 
       const handleCateAdded = (newCate) => {
-        axios.get('http://localhost:3001/cate/viewAll', {
+        axios.get(`${API_URL}/cate/viewAll`, {
             headers: {
                 accessToken: localStorage.getItem("accessToken"),
             }

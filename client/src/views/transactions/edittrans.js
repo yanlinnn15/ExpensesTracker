@@ -6,6 +6,7 @@ import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';  
 import { useNavigate } from 'react-router-dom'; 
+import API_URL from '../../config/api';
 
 // Function to render icons dynamically
 const renderIcon = (iconName) => {
@@ -60,10 +61,10 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
         setIsLoading(true);
       
         Promise.all([
-            axios.get("http://localhost:3001/cate/viewAll", {
+            axios.get(`${API_URL}/cate/viewAll`, {
                 headers: { accessToken: token }
             }),
-            axios.get(`http://localhost:3001/trans/view/${transactionId}`, {
+            axios.get(`${API_URL}/trans/view/${transactionId}`, {
                 headers: { accessToken: token }
             })
         ])
@@ -90,15 +91,15 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
 
     const formik = useFormik({
         initialValues: {
-            amount: transaction.amount,
-            remark: transaction.remark,
-            CategoryId: transaction.CategoryId,
-            date: transaction.date,
+            amount: trans ? trans.amount : '',
+            remark: trans ? trans.remark : '',
+            CategoryId: trans ? trans.CategoryId : '',
+            date: trans ? trans.date : today,
         },
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {    
-            axios.patch(`http://localhost:3001/trans/edit/${transactionId}`, data, {
+            axios.patch(`${API_URL}/trans/edit/${transactionId}`, data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

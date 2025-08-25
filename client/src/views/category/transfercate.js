@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as TablerIcons from "@tabler/icons-react"; 
 import SelectTransCate from './selecttranscate';
+import API_URL from '../../config/api';
 
 const style = {
     position: 'absolute',
@@ -38,7 +39,7 @@ function TransferCate({ open, onClose, CateId, onProcessing }) {
             return;
         }
 
-        axios.get(`http://localhost:3001/trans/count/${CateId}`, {
+        axios.get(`${API_URL}/trans/count/${CateId}`, {
             headers: { accessToken: token }
         })
         .then((response) => {

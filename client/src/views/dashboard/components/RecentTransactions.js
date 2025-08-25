@@ -15,6 +15,7 @@ import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../../../config/api';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -31,7 +32,7 @@ function RecentTransactions() {
     if (!localStorage.getItem("accessToken")) {
       navigation('/auth/login');
     } else {
-      axios.get(`http://localhost:3001/trans/viewAll`, {
+      axios.get(`${API_URL}/trans/viewAll`, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         }

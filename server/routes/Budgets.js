@@ -47,7 +47,14 @@ router.post("/", validateToken, async (req,res) => {
 
 router.get("/viewAll", validateToken, async (req, res) => {
     try {
+        console.log('ViewAll budgets request received');
         const uid = req.user.id;
+        
+        if (!uid) {
+            console.log('No user ID found');
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        console.log('Looking up budgets for user:', uid);
 
         const currentYear = new Date().getFullYear();
         const startOfYear = new Date(`${currentYear}-01-01`);

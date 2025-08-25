@@ -7,7 +7,7 @@ const { Op, fn, col } = require('sequelize');
 
 
 const ESchema = Joi.object({
-    date: Joi.date().iso().custom((value, helpers) => {
+    date: Joi.date().iso().required().custom((value, helpers) => {
         const dateString = value.toISOString().split('T')[0]; // Extracting only the date part
         if (dateString !== value.toISOString().split('T')[0]) {
             return helpers.error('any.invalid');
@@ -17,63 +17,85 @@ const ESchema = Joi.object({
     amount: Joi.number()
                 .precision(2)
                 .min(0.01)
-                .max(99999999999999999999.99),
-    remark: Joi.string().min(0).max(255),
-    CategoryId: Joi.number().integer().min(1),
-    type: Joi.boolean(),
-}).min(1);
+                .max(99999999999999999999.99)
+                .required(),
+    remark: Joi.string().min(0).max(255).allow('').allow(null),
+    CategoryId: Joi.number().integer().min(1).required(),
+    type: Joi.boolean().required(),
+    //createdByGuest: Joi.boolean(),
+    //createdByGoogle: Joi.boolean(),
+    UserId: Joi.number()
+});
 
 
 //create Transactions
 router.post("/", validateToken, async (req,res) => {
-    const transaction = req.body;
     const uid = req.user.id;
     
-    // Get user info to determine transaction type
-    const user = await Users.findByPk(uid);
-    transaction.createdByGuest = user.isGuest;
-    transaction.createdByGoogle = !!user.googleId;
-    const {error, value} = ESchema.validate(transaction);
+    try {
+        // Get user info to determine transaction type
+        const user = await Users.findByPk(uid);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
-    if (error) 
-        return res.status(400).json({ error: error.details[0].message });
-
-    try{
-        const trans = await Transactions.create({
-            date:transaction.date,
-            amount: transaction.amount,
-            remark: transaction.remark,
-            CategoryId: transaction.CategoryId,
-            type:transaction.type,
+        // Create the transaction data object
+        const newTransaction = {
+            date: req.body.date,
+            amount: req.body.amount,
+            remark: req.body.remark || '',
+            CategoryId: req.body.CategoryId,
+            type: req.body.type,
             UserId: uid
-        });
-        
+        };
 
-        res.status(201).json({ message: "Transactions Created Successfully!", trans });
-    }catch(error){
-        console.error(error);
-        res.status(500).json({message: "Server Error"});
+        console.log('Creating transaction with data:', newTransaction);
+
+        // Create the transaction
+        const transaction = await Transactions.create(newTransaction);
+
+        res.status(201).json({ message: "Transaction Created Successfully!", trans: transaction });
+    } catch(error) {
+        console.error("Transaction creation error:", error.name, error.message);
+        if (error.name === 'SequelizeValidationError') {
+            return res.status(400).json({ message: "Validation error", errors: error.errors.map(e => e.message) });
+        }
+        if (error.name === 'SequelizeForeignKeyConstraintError') {
+            return res.status(400).json({ message: "Invalid Category or User ID" });
+        }
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
 });
 
 //view transaction
 router.get("/viewAll", validateToken, async (req, res) => {
-    
-    try{
+    try {
         const mth = req.query.mth;
         const uid = req.user.id;
 
-        const startDate = new Date(`${mth}-01`);
-        const endDate = new Date(startDate);
-        endDate.setMonth(endDate.getMonth() + 1); 
-        endDate.setDate(0);
+        if (!uid) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        let startDate, endDate;
+        if (mth) {
+            startDate = new Date(`${mth}-01`);
+            if (isNaN(startDate.getTime())) {
+                return res.status(400).json({ message: "Invalid month format. Use YYYY-MM" });
+            }
+            endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + 1);
+            endDate.setDate(0);
+        }
 
         let whereClause = { UserId: uid };
         
-        whereClause = {
-            ...whereClause,
-            date :{  [Op.between]: [startDate, endDate]  },
-        };
+        if (mth) {
+            whereClause = {
+                ...whereClause,
+                date: { [Op.between]: [startDate, endDate] },
+            };
+        }
 
         const transaction = await Transactions.findAll({
             where: whereClause,
@@ -133,7 +155,7 @@ router.get("/viewAll", validateToken, async (req, res) => {
             where: { ...whereClause},
             group: [fn('YEAR', col("date")), fn('MONTH', col("date")), "CategoryId", 'type'],
             order: [
-              [fn('YEAR', col('date')), 'DESC'], 
+              [fn('YEAR', col('date')), 'DESC'],
               [fn('MONTH', col('date')), 'DESC']
             ],
             include: [
@@ -183,10 +205,13 @@ router.get("/viewMonth", validateToken, async (req, res) => {
                 [fn('YEAR', col('date')), 'year'],
                 [fn('MONTH', col('date')), 'month'],
                 [fn('SUM', col('amount')), 'totalAmount']
-            ],where: {... whereClause, type:0},
+            ],
+            where: {... whereClause, type:0},
             group: [fn('YEAR', col("date")), fn('MONTH', col("date"))],
-            order : [[fn('YEAR', col('date')), 'DESC'], 
-                    [fn('MONTH', col('date')), 'DESC']]
+            order : [
+                [fn('YEAR', col('date')), 'DESC'],
+                [fn('MONTH', col('date')), 'DESC']
+            ]
         });
 
         const monthlyI = await Transactions.findAll({
@@ -194,10 +219,13 @@ router.get("/viewMonth", validateToken, async (req, res) => {
                 [fn('YEAR', col('date')), 'year'],
                 [fn('MONTH', col('date')), 'month'],
                 [fn('SUM', col('amount')), 'totalAmount']
-            ],where: {... whereClause, type:1},
+            ],
+            where: {... whereClause, type:1},
             group: [fn('YEAR', col("date")), fn('MONTH', col("date"))],
-            order : [[fn('YEAR', col('date')), 'DESC'], 
-                    [fn('MONTH', col('date')), 'DESC']]
+            order : [
+                [fn('YEAR', col('date')), 'DESC'],
+                [fn('MONTH', col('date')), 'DESC']
+            ]
         });
 
         if(!monthlyE && !monthlyI)

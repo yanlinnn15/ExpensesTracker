@@ -7,6 +7,7 @@ import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { showsweetAlert } from '../../helpers/alert';
+import API_URL from '../../config/api';
 
 const renderIcon = (iconName) => {
     const IconComponent = TablerIcons[iconName]; 
@@ -50,7 +51,7 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
       
         setIsLoading(true);
       
-        axios.get("http://localhost:3001/cate/viewAll", {
+        axios.get(`${API_URL}/cate/viewAll`, {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -77,7 +78,7 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
         },
         validationSchema: validationSchema,
         onSubmit: (data) => {
-            axios.post('http://localhost:3001/budget/', data, {
+            axios.post(`${API_URL}/budget/`, data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

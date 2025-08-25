@@ -21,6 +21,7 @@ import DashboardCard from '../../components/shared/DashboardCard';
 import { IconCoin, IconFilter, IconChevronRight } from "@tabler/icons-react";
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import API_URL from '../../config/api';
 
 const Balances = () => {
   const [errormsg, setErrorMsg] = useState(null);
@@ -47,7 +48,7 @@ const Balances = () => {
       balance: 0.00,
     }));
 
-    axios.get("http://localhost:3001/trans/viewMonth", {
+    axios.get(`${API_URL}/trans/viewMonth`, {
       headers: { accessToken: localStorage.getItem('accessToken') }
     })
       .then((response) => {

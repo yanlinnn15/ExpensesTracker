@@ -5,6 +5,7 @@ import CustomTextField from '../../../components/forms/theme-elements/CustomText
 import { Stack } from '@mui/system';
 import * as Yup from 'yup';
 import { showsweetAlert } from '../../../helpers/alert';
+import API_URL from '../../../config/api';
 
 function AuthVeri({ title, subtitle, subtext }) {
     const [email, setEmail] = useState("");
@@ -42,7 +43,7 @@ function AuthVeri({ title, subtitle, subtext }) {
                         return prevCountdown - 1;
                     });
                 }, 1000);
-                return axios.post("http://localhost:3001/auth/resendveri", data);
+                return axios.post(`${API_URL}/auth/resendveri`, data);
             })
             .then((response) => {
                 const { message } = response.data;

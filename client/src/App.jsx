@@ -1,16 +1,18 @@
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { useRoutes } from 'react-router-dom';
-import Router from './routes/Router';
+import Router from './routes/Router.jsx';
 import { AuthContext } from './helpers/AuthContext';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import API_URL from './config/api';
 import { baselightTheme } from "./theme/DefaultColors";
+import API_URL from './config/api';
 
 const App = () => {
-  const [authState, setAuthState] = useState({ fname: "", id: 0, status: false });
-  const [error, setError] = useState(null); 
-  const [loading, setLoading] = useState(true);;
+  const [authState, setAuthState] = useState({ 
+    fname: "", 
+    id: 0, 
+    status: false 
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -27,28 +29,22 @@ const App = () => {
             setAuthState({
               fname: response.data.fname,
               id: response.data.id,
-              status: true
+              status: true,
             });
           }
         })
         .catch((error) => {
-          console.error("Error fetching auth status:", error);
-          setError("Failed to authenticate. Please log in again.");
+          console.error('Auth check error:', error);
           setAuthState({ ...authState, status: false });
-        })
-        .finally(() => {
-          setLoading(false);
         });
     }
-
   }, []);
 
   const routing = useRoutes(Router);
-  const theme = baselightTheme;
 
   return (
     <AuthContext.Provider value={{ authState, setAuthState }}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={baselightTheme}>
         <CssBaseline />
         {routing}
       </ThemeProvider>

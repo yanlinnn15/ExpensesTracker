@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../../config/api';
 
 const validationSchema = Yup.object({
     amount: Yup.number()
@@ -27,7 +28,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
 
         setIsLoading(true);
 
-        axios.get("http://localhost:3001/cate/viewAll", {
+        axios.get(`${API_URL}/cate/viewAll`, {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -51,7 +52,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {
-            axios.patch(`http://localhost:3001/budget/edit/${Bid}`, data, {
+            axios.patch(`${API_URL}/budget/edit/${Bid}`, data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

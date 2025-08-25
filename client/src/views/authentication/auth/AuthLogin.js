@@ -11,6 +11,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../helpers/AuthContext';
 import CustomTextField from '../../../components/forms/theme-elements/CustomTextField';
+import API_URL from '../../../config/api';
 
 function AuthLogin({ title, subtitle, subtext }) {
     const [email, setemail] = useState("");
@@ -34,7 +35,7 @@ function AuthLogin({ title, subtitle, subtext }) {
         }
 
         const data = { email: email, password: password };
-        axios.post("http://localhost:3001/auth/login", data)
+        axios.post(`${API_URL}/auth/login`, data)
             .then((response) => {
                 if (response.data.token) {
                     localStorage.setItem("accessToken", response.data.token);
@@ -45,7 +46,8 @@ function AuthLogin({ title, subtitle, subtext }) {
                     });
                     navigate('/');
                 } else {                    
-                    const verificationMessage = `Please verify your email. Click here to verify: <a href='http://localhost:5173/auth/verify'>Verify Email</a>`;
+                    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+                    const verificationMessage = `Please verify your email. Click here to verify: <a href='${frontendUrl}/auth/verify'>Verify Email</a>`;
                     setAlertMessage(verificationMessage);
                     setAlertSeverity("error");
                     setOpen(true);

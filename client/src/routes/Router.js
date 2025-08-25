@@ -22,14 +22,12 @@ const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const GoogleCallback = Loadable(lazy(() => import('../views/authentication/GoogleCallback')));
 
-
-
 const Router = [
   {
     path: '/',
     element: <FullLayout />,
     children: [
-      { path: '/', element: <Navigate to="/dashboard" /> },
+      { path: '/', element: <Navigate to="/auth/login" /> },
       { path: '/dashboard', exact: true, element: <Dashboard /> },
       { path: '/transactions', exact: true, element: <Transaction /> },
       { path: '/addtrans', exact: true, element: <AddTrans /> },
@@ -49,8 +47,8 @@ const Router = [
     element: <BlankLayout />,
     children: [
       { path: '404', element: <Error /> },
-      { path: '/auth/login', element: <Login /> },
-      { path: '/auth/google-callback', element: <GoogleCallback /> },
+      { path: 'login', element: <Login /> },
+      { path: 'google-callback', element: <GoogleCallback /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },

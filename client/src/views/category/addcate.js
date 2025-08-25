@@ -6,6 +6,7 @@ import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';  
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../../config/api';
 
 const renderIcon = (iconName) => {
     const IconComponent = TablerIcons[iconName]; 
@@ -47,7 +48,7 @@ function AddCate({ open, onClose, onCateAdded}) {
       
         setIsLoading(true);
       
-        axios.get("http://localhost:3001/icon/view", {
+        axios.get(`${API_URL}/icon/view`, {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -77,7 +78,7 @@ function AddCate({ open, onClose, onCateAdded}) {
         },
         validationSchema: validationSchema,
         onSubmit: (data) => {  
-            axios.post('http://localhost:3001/cate/', data, {
+            axios.post(`${API_URL}/cate/`, data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

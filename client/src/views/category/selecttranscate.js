@@ -4,6 +4,7 @@ import { IconSquareRoundedX } from '@tabler/icons-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as TablerIcons from "@tabler/icons-react"; 
+import API_URL from '../../config/api';
 
 const style = {
     position: 'absolute',
@@ -38,7 +39,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
             return;
         }
 
-        axios.get(`http://localhost:3001/cate/someCate/${CateId}`, {
+        axios.get(`${API_URL}/cate/someCate/${CateId}`, {
             headers: { accessToken: token }
         })
         .then(response => setCategories(response.data))
@@ -58,7 +59,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
             console.log(selectedTransactions)
             const migrationPromises =selectedTransactions.map((transId) => {
                 console.log(transId)
-                return axios.patch(`http://localhost:3001/trans/edit/${transId}`, {
+                return axios.patch(`${API_URL}/trans/edit/${transId}`, {
                     CategoryId: newCategoryId,
                 }, {
                     headers: { accessToken: token }

@@ -22,6 +22,7 @@ import AddBudget from './addbudget';
 import EditBudget from './editbudget';
 import DeleteBudget from './deletebudget';
 import { showToast } from '../../helpers/showtoast';
+import API_URL from '../../config/api';
 
 function Budgets() {
   const theme = useTheme();
@@ -44,7 +45,7 @@ function Budgets() {
       navigator('/auth/login');
       return;
     }
-    axios.get("http://localhost:3001/budget/viewAll", {
+    axios.get(`${API_URL}/budget/viewAll`, {
       headers: { accessToken },
     })
     .then((response) => {
@@ -66,7 +67,7 @@ function Budgets() {
   }, [navigator]);
 
   const handleBudgetAdded = (newCate) => {
-    axios.get('http://localhost:3001/budget/viewAll', {
+    axios.get(`${API_URL}/budget/viewAll`, {
       headers: {
         accessToken: localStorage.getItem("accessToken"),
       }

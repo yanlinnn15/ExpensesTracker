@@ -6,6 +6,7 @@ import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';  
 import { useNavigate } from 'react-router-dom'; 
+import API_URL from '../../config/api';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -44,8 +45,9 @@ const initialValues = {
 const validationSchema = Yup.object({
   amount: Yup.number().required('Required').min(0.1, 'Must be at least 0.1'),
   remark: Yup.string().optional(),
-  CategoryId: Yup.string().required('Required'),
+  CategoryId: Yup.number().required('Required').positive('Must be a valid category'),
   date: Yup.date().required('Required'),
+  type: Yup.boolean().required('Required')
 });
 
 function AddExpenses({ open, onClose, getExpenses }) {
@@ -62,7 +64,7 @@ function AddExpenses({ open, onClose, getExpenses }) {
     if (!localStorage.getItem("accessToken")) {
       navigate("/auth/login");  
     } else {
-      axios.get("http://localhost:3001/cate/viewAll", {
+      axios.get(`${API_URL}/cate/viewAll`, {
         headers: { accessToken: localStorage.getItem("accessToken") }
       }).then((response) => {
         if (response.data) {
@@ -77,7 +79,18 @@ function AddExpenses({ open, onClose, getExpenses }) {
   }, [navigate]);
 
   const onSubmit = (data) => {    
-    axios.post("http://localhost:3001/trans/", data, {
+    // Ensure correct data types
+    const transactionData = {
+      amount: Number(data.amount),
+      CategoryId: Number(data.CategoryId),
+      date: data.date,
+      remark: data.remark || "",
+      type: false // Force type to be false for expense
+    };
+
+    console.log('Submitting transaction:', transactionData); // Debug log
+
+    axios.post(`${API_URL}/trans/`, transactionData, {
         headers: { accessToken: localStorage.getItem("accessToken") }
     }).then((response) => {
         console.log("Server response:", response.data);
@@ -97,7 +110,8 @@ function AddExpenses({ open, onClose, getExpenses }) {
         }
     }).catch((error) => {
         console.error("Error submitting expense:", error);
-        const message = error.response ? error.response.data.message : error.message;
+        console.log("Error response:", error.response?.data); // Log the full error response
+        const message = error.response?.data?.error || error.response?.data?.message || error.message;
         setDialogMessage(message);
         setDialogOpen(true);
     });
@@ -143,6 +157,17 @@ function AddExpenses({ open, onClose, getExpenses }) {
                   variant="outlined"
                   displayEmpty
                   error={touched.CategoryId && !!errors.CategoryId}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    handleChange({
+                      ...e,
+                      target: {
+                        ...e.target,
+                        name: 'CategoryId',
+                        value: value
+                      }
+                    });
+                  }}
                 >
                   {cate.map((cat) => (
                     <MenuItem key={cat.id} value={cat.id}>

@@ -1,8 +1,12 @@
 const { verify } = require("jsonwebtoken");
 
 module.exports = (sequelize, DataTypes) => {
-
     const Users = sequelize.define("Users", {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
         fName: {
             type: DataTypes.STRING,
             allowNull: false
@@ -21,32 +25,35 @@ module.exports = (sequelize, DataTypes) => {
         },
         isGuest: {
             type: DataTypes.BOOLEAN,
+            allowNull: false,
             defaultValue: false
         },
         active: {
             type: DataTypes.BOOLEAN,
+            allowNull: false,
             defaultValue: true
         },
         lastActive: {
             type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW
+            allowNull: true
         },
         registeredAt: {
             type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW
-        },
-
+            allowNull: true
+        }
+    }, {
+        tableName: 'Users'
     });
 
     Users.associate = (models) => {
         Users.hasMany(models.Categories, {
-            onDelete: "CASCADE"
-        });
-        Users.hasMany(models.Budgets, {
-            onDelete: "CASCADE"
+            onDelete: "cascade"
         });
         Users.hasMany(models.Transactions, {
-            onDelete: "CASCADE"
+            onDelete: "cascade"
+        });
+        Users.hasMany(models.Budgets, {
+            onDelete: "cascade"
         });
     };
 

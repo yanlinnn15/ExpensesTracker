@@ -1,128 +1,140 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Grid, Box, Card, Stack, Typography, Button, CircularProgress } from '@mui/material';
+import { Grid, Box, Card, Stack, Typography, Button, CircularProgress, Container } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
-import Logo from 'src/layouts/full/shared/logo/Logo';
-import { Google as GoogleIcon } from '@mui/icons-material';
+import { Google as GoogleIcon, PersonOutline as GuestIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../helpers/showtoast';
+import API_URL from '../../config/api';
+import axios from 'axios';
 
-const Login2 = () => {
+const Login = () => {
   const [loading, setLoading] = useState({ google: false, guest: false });
   const navigate = useNavigate();
 
   const handleGoogleLogin = () => {
     setLoading(prev => ({ ...prev, google: true }));
-    // Redirect to backend Google OAuth route
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   const handleGuestLogin = async () => {
     setLoading(prev => ({ ...prev, guest: true }));
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/guest`, {
-        method: 'POST',
+      console.log('Attempting guest login to:', `${API_URL}/auth/guest`);
+      
+      // Add timeout to the request
+      const response = await axios.post(`${API_URL}/auth/guest`, {}, {
+        withCredentials: true,
+        timeout: 5000, // 5 second timeout
         headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for cookies
+          'Content-Type': 'application/json'
+        }
       });
 
-      const data = await response.json();
-      if (response.ok && data.token) {
-        localStorage.setItem('accessToken', data.token);
-        showToast('Welcome! You are logged in as a guest', 'success');
+      console.log('Guest login response:', response.data);
+
+      if (response.data.token) {
+        localStorage.setItem('accessToken', response.data.token);
+        localStorage.setItem('userId', response.data.id);
+        localStorage.setItem('fname', response.data.fname);
+        showToast('Successfully logged in as guest', 'success');
         navigate('/dashboard');
       } else {
-        throw new Error(data.message || 'Failed to login as guest');
+        throw new Error(response.data.message || 'Failed to login as guest');
       }
     } catch (error) {
-      console.error('Guest login error:', error);
-      showToast(error.message || 'Failed to login as guest. Please try again.', 'error');
+      console.error('Guest login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers
+        }
+      });
+
+      let errorMessage = 'Failed to login as guest: ';
+      if (error.code === 'ECONNABORTED') {
+        errorMessage += 'Request timed out. Server might be down.';
+      } else if (!error.response) {
+        errorMessage += 'Cannot connect to server. Please check if the server is running.';
+      } else {
+        errorMessage += error.response.data?.message || error.message;
+      }
+      
+      showToast(errorMessage, 'error');
     } finally {
       setLoading(prev => ({ ...prev, guest: false }));
     }
   };
-  
+
   return (
-    <PageContainer title="Login" description="this is Login page">
+    <PageContainer title="Login - Personal Expense Tracker">
       <Box
         sx={{
-          position: 'relative',
-          '&:before': {
-            content: '""',
-            background: 'radial-gradient(#d2f1df, #d3d7fa, #bad8f4)',
-            backgroundSize: '400% 400%',
-            animation: 'gradient 15s ease infinite',
-            position: 'absolute',
-            height: '100%',
-            width: '100%',
-            opacity: '0.3',
-          },
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: (theme) => theme.palette.grey[100],
         }}
       >
-        <Grid container spacing={0} justifyContent="center" sx={{ height: '100vh' }}>
-          <Grid item xs={12} sm={8} lg={4} xl={3}>
-            <Box
-              sx={{
-                position: 'relative',
-                height: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Card elevation={9} sx={{ p: 4, zIndex: 1, width: '100%' }}>
-                <Box display="flex" alignItems="center" justifyContent="center">
-                  <Logo />
-                </Box>
-                <Stack spacing={3}>
-                  <Box>
-                    <Typography variant="h3" textAlign="center" mb={2}>
-                      Welcome to Expense Tracker
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" textAlign="center" mb={3}>
-                      Track your expenses, manage your budget, and reach your financial goals
-                    </Typography>
-                  </Box>
-                  
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={loading.google ? <CircularProgress size={20} color="inherit" /> : <GoogleIcon />}
-                    onClick={handleGoogleLogin}
-                    disabled={loading.google || loading.guest}
-                    sx={{
-                      backgroundColor: '#4285F4',
-                      color: 'white',
-                      '&:hover': {
-                        backgroundColor: '#357ABD',
-                      },
-                    }}
-                  >
-                    {loading.google ? 'Connecting...' : 'Continue with Google'}
-                  </Button>
+        <Container maxWidth="sm">
+          <Card
+            elevation={24}
+            sx={{
+              p: 4,
+              borderRadius: 4,
+              backgroundColor: 'white',
+            }}
+          >
+            <Stack spacing={4} alignItems="center">
+              <Typography variant="h4" component="h1" gutterBottom textAlign="center">
+                Personal Expense Tracker
+              </Typography>
 
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    onClick={handleGuestLogin}
-                    disabled={loading.google || loading.guest}
-                    startIcon={loading.guest && <CircularProgress size={20} />}
-                  >
-                    {loading.guest ? 'Creating guest account...' : 'Continue as Guest'}
-                  </Button>
+              <Stack spacing={2} width="100%">
+                <Button
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  startIcon={loading.google ? <CircularProgress size={20} /> : <GoogleIcon />}
+                  onClick={handleGoogleLogin}
+                  disabled={loading.google || loading.guest}
+                  sx={{
+                    py: 1.5,
+                    backgroundColor: '#4285F4',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#357ABD',
+                    },
+                  }}
+                >
+                  {loading.google ? 'Connecting...' : 'Continue with Google'}
+                </Button>
 
-                  <Typography variant="caption" color="text.secondary" align="center">
-                    Guest data will be deleted after 24 hours of inactivity
-                  </Typography>
-                </Stack>
-              </Card>
-            </Box>
-          </Grid>
-        </Grid>
+                <Button
+                  fullWidth
+                  size="large"
+                  variant="outlined"
+                  startIcon={loading.guest ? <CircularProgress size={20} /> : <GuestIcon />}
+                  onClick={handleGuestLogin}
+                  disabled={loading.google || loading.guest}
+                  sx={{ py: 1.5 }}
+                >
+                  {loading.guest ? 'Creating account...' : 'Continue as Guest'}
+                </Button>
+              </Stack>
+
+              <Typography variant="caption" color="textSecondary" textAlign="center">
+                Guest accounts and their data will be automatically deleted after 24 hours of inactivity
+              </Typography>
+            </Stack>
+          </Card>
+        </Container>
       </Box>
     </PageContainer>
   );
 };
 
-export default Login2;
+export default Login;

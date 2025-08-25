@@ -4,15 +4,16 @@ import { useTheme } from '@mui/material/styles';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../../../config/api';
 
 
 
 const BudgetTracker = () => {
-
     let navigator = useNavigate();
     
     const theme = useTheme();
     const [budgetTrans, setBudgetTrans] = useState([]);
+    const [errorMsg, setErrorMsg] = useState('');
 
 
     useEffect(() => {
@@ -21,7 +22,7 @@ const BudgetTracker = () => {
           navigator('/auth/login');
           return;
         }
-        axios.get("http://localhost:3001/budget/viewAll", {
+        axios.get(`${API_URL}/budget/viewAll`, {
           headers: { accessToken },
         })
         .then((response) => {

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import TransferCate from './transfercate';
 import { SuccessDialog } from '../Dialog/success';
+import API_URL from '../../config/api';
 
 const style = {
     position: 'absolute',
@@ -36,7 +37,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
         }
 
         setIsLoading(true);
-        axios.get(`http://localhost:3001/trans/count/${CateId}`, {
+        axios.get(`${API_URL}/trans/count/${CateId}`, {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -69,7 +70,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
         setOpenTransModal(false);
         setIsLoading(true);
         try {
-            await axios.delete(`http://localhost:3001/cate/dlt/${CateId}`, {
+            await axios.delete(`${API_URL}/cate/dlt/${CateId}`, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             });
             onCateDeleted(CateId); 

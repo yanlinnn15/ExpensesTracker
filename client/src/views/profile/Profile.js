@@ -7,6 +7,7 @@ import axios from 'axios';
 import { AuthContext } from '../../helpers/AuthContext';
 import * as Yup from 'yup';
 import { showToast } from '../../helpers/showtoast';
+import API_URL from '../../config/api';
 
 
 const Profile = () => {
@@ -32,7 +33,7 @@ const Profile = () => {
       return;
     }
 
-    axios.get(`http://localhost:3001/auth/profile/${id}`, 
+    axios.get(`${API_URL}/auth/profile/${id}`, 
       {headers: {accessToken: localStorage.getItem("accessToken")}})
       .then((response) => {
         setFirstName(response.data.fName);
@@ -56,7 +57,7 @@ const Profile = () => {
   
     try {
       const response = await axios.patch(
-        `http://localhost:3001/auth/edit/${id}`,
+        `${API_URL}/auth/edit/${id}`,
         { fname: firstName, lname: lastName },
         { headers: { accessToken: localStorage.getItem("accessToken") } }
       );
@@ -114,7 +115,7 @@ const Profile = () => {
     }
 
     const data = { password: newPassword,confirmPassword: confirmPassword };
-    axios.put(`http://localhost:3001/auth/pass/${id}`, data, 
+    axios.put(`${API_URL}/auth/pass/${id}`, data, 
       { headers: { accessToken: localStorage.getItem("accessToken") } }
     )
         .then((response) => {
