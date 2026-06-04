@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Stack, Typography, Avatar, Box, Select, MenuItem, Card, CardContent } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import getLast12Months from '../../func/func12m';
-import axios from 'axios';
+import api from 'src/api';
 import * as TablerIcons from "@tabler/icons-react";
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -34,7 +34,7 @@ const BalanceOverview = () => {
       navigate('/auth/login');
       return;
     }
-    axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+    api.get(`/trans/viewAll?mth=${selectedDate}`, {
       headers: { accessToken: localStorage.getItem("accessToken") }
     })
     .then((response) => {

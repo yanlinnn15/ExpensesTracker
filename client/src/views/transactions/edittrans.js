@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';  
+﻿import React, { useState, useEffect } from 'react';  
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
-import axios from 'axios';  
+import api from 'src/api';  
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -61,10 +61,10 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
       
         const token = localStorage.getItem("accessToken");
         Promise.all([
-            axios.get("http://localhost:3001/cate/viewAll", {
+            api.get("/cate/viewAll", {
                 headers: { accessToken: token }
             }),
-            axios.get(`http://localhost:3001/trans/view/${transactionId}`, {
+            api.get(`/trans/view/${transactionId}`, {
                 headers: { accessToken: token }
             })
         ])
@@ -99,7 +99,7 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {    
-            axios.patch(`http://localhost:3001/trans/edit/${transactionId}`, data, {
+            api.patch(`/trans/edit/${transactionId}`, data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

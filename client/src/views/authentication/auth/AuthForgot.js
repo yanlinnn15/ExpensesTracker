@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Box, Typography, Button, Snackbar, Alert, CircularProgress } from '@mui/material';
-import axios from 'axios';
+import api from 'src/api';
 import CustomTextField from '../../../components/forms/theme-elements/CustomTextField';
 import { Stack } from '@mui/system';
 import * as Yup from 'yup';
@@ -31,7 +31,7 @@ function AuthForgot({ title, subtitle, subtext }) {
                 const data = { email };
                 setLoading(true); 
                 setDisabledTime(60); 
-                return axios.post("http://localhost:3001/auth/forgotlink", data);
+                return api.post("/auth/forgotlink", data);
             })
             .then((response) => {
                 const { message } = response.data;

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, TextField, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
-import axios from 'axios';
+import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -28,7 +28,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
         setIsLoading(true);
 
         const token = localStorage.getItem("accessToken");
-        axios.get("http://localhost:3001/cate/viewAll", {
+        api.get("/cate/viewAll", {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -52,7 +52,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {
-            axios.patch(`http://localhost:3001/budget/edit/${Bid}`, data, {
+            api.patch(`/budget/edit/${Bid}`, data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

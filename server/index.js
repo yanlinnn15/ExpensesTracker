@@ -1,9 +1,12 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const { Op } = require('sequelize');
 
 app.use(express.json());
-app.use(cors({origin: 'http://localhost:5173'}));
+app.use(cors({ origin: process.env.CLIENT_URL }));
 
 const db = require('./models');
 
@@ -18,7 +21,14 @@ app.use('/budget', budgetRouter);
 const iconRouter = require('./routes/Icons');
 app.use('/icon', iconRouter);
 
-const { Op } = require('sequelize');
+app.use((req, res, next) => {
+    next({ status: 404, message: `Route not found: ${req.method} ${req.url}` });
+});
+
+const errorHandler = require('./middlewares/errorHandler');
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 3001;
 
 db.sequelize.sync({ alter: true }).then(async () => {
     // Delete abandoned guest accounts older than 24 hours
@@ -29,7 +39,7 @@ db.sequelize.sync({ alter: true }).then(async () => {
     });
     if (deleted > 0) console.log(`Cleaned up ${deleted} expired guest account(s)`);
 
-    app.listen(3001, () => {
-        console.log("server running on port 3001");
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT} [${process.env.NODE_ENV}]`);
     });
 });

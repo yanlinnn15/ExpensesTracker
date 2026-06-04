@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
   Typography,
   IconButton,
@@ -17,7 +17,7 @@ import { IconCircleCheck, IconPencil, IconPlus, IconTrash } from '@tabler/icons-
 import DashboardCard from '../../components/shared/DashboardCard';
 import Chart from 'react-apexcharts';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from 'src/api';
 import AddBudget from './addbudget';
 import EditBudget from './editbudget';
 import DeleteBudget from './deletebudget';
@@ -46,7 +46,7 @@ function Budgets() {
     }
 
     const accessToken = localStorage.getItem("accessToken");
-    axios.get("http://localhost:3001/budget/viewAll", {
+    api.get("/budget/viewAll", {
       headers: { accessToken },
     })
     .then((response) => {
@@ -68,7 +68,7 @@ function Budgets() {
   }, []);
 
   const handleBudgetAdded = (newCate) => {
-    axios.get('http://localhost:3001/budget/viewAll', {
+    api.get('/budget/viewAll', {
       headers: {
         accessToken: localStorage.getItem("accessToken"),
       }

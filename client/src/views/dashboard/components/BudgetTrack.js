@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react';
+﻿import React, {useState, useEffect} from 'react';
 import { Select, MenuItem, Typography, LinearProgress, Box, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import DashboardCard from '../../../components/shared/DashboardCard';
-import axios from 'axios';
+import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -23,7 +23,7 @@ const BudgetTracker = () => {
         }
         
         const accessToken = localStorage.getItem("accessToken");
-        axios.get("http://localhost:3001/budget/viewAll", {
+        api.get("/budget/viewAll", {
           headers: { accessToken },
         })
         .then((response) => {

@@ -8,7 +8,7 @@ const validateToken = async (req,res,next) => {
         return res.status(401).json({ error: "User not logged in" });
 
     try{
-        const token = verify(accessToken, "important");
+        const token = verify(accessToken, process.env.JWT_SECRET);
         const checkActive = await Users.findOne({where: {id:token.id}});
 
         if(!checkActive)

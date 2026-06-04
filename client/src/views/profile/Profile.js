@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
+﻿import React, { useEffect, useState, useContext } from 'react';
 import { Typography, TextField, Button, DialogContentText, Alert, Box, Grid, Paper, Snackbar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import DashboardCard from '../../components/shared/DashboardCard';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from 'src/api';
 import { AuthContext } from '../../helpers/AuthContext';
 import * as Yup from 'yup';
 import { showToast } from '../../helpers/showtoast';
@@ -33,7 +33,7 @@ const Profile = () => {
       return;
     }
 
-    axios.get(`http://localhost:3001/auth/profile/${id}`,
+    api.get(`/auth/profile/${id}`,
       {headers: {accessToken: localStorage.getItem("accessToken")}})
       .then((response) => {
         setFirstName(response.data.fName);
@@ -65,8 +65,8 @@ const Profile = () => {
     }
   
     try {
-      const response = await axios.patch(
-        `http://localhost:3001/auth/edit/${id}`,
+      const response = await api.patch(
+        `/auth/edit/${id}`,
         { fname: firstName, lname: lastName },
         { headers: { accessToken: localStorage.getItem("accessToken") } }
       );
@@ -132,7 +132,7 @@ const Profile = () => {
     }
 
     const data = { password: newPassword,confirmPassword: confirmPassword };
-    axios.put(`http://localhost:3001/auth/pass/${id}`, data, 
+    api.put(`/auth/pass/${id}`, data, 
       { headers: { accessToken: localStorage.getItem("accessToken") } }
     )
         .then((response) => {

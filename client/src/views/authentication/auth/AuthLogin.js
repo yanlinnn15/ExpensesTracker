@@ -1,5 +1,5 @@
-import { React, useState, useContext } from 'react';
-import axios from 'axios';
+﻿import { React, useState, useContext } from 'react';
+import api from 'src/api';
 import {
     Box,
     Typography,
@@ -34,7 +34,7 @@ function AuthLogin({ title, subtitle, subtext }) {
         }
 
         const data = { email: email, password: password };
-        axios.post("http://localhost:3001/auth/login", data)
+        api.post("/auth/login", data)
             .then((response) => {
                 if (response.data.token) {
                     localStorage.setItem("accessToken", response.data.token);
@@ -63,7 +63,7 @@ function AuthLogin({ title, subtitle, subtext }) {
 
     const ContinueAsGuest = async () => {
         try {
-            const response = await axios.post("http://localhost:3001/auth/guest");
+            const response = await api.post("/auth/guest");
             localStorage.setItem("accessToken", response.data.token);
             localStorage.setItem("isGuest", "true");
             setAuthState({

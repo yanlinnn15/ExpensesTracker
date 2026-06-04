@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography, Button } from '@mui/material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from 'src/api';
 import ErrorImg from 'src/assets/images/backgrounds/404-error-idea.gif';
 import { IconCheck } from '@tabler/icons-react';
 
@@ -16,7 +16,7 @@ function Verify() {
     const id = queryParams.get("id");
 
     useEffect(() => {
-        axios.post(`http://localhost:3001/auth/verify-email?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`)
+        api.post(`/auth/verify-email?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`)
             .then(response => {
                 setMsg(response.data.message); 
             })

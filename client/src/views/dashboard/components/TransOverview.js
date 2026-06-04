@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -15,7 +15,7 @@ import {
 import DashboardCard from '../../../components/shared/DashboardCard';
 import { IconGridDots } from "@tabler/icons-react";
 import getLast12Months from '../../func/func12m';
-import axios from 'axios';
+import api from 'src/api';
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -45,7 +45,7 @@ const TransOverview = () => {
       navigate('/auth/login');
       return;
     }
-    axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+    api.get(`/trans/viewAll?mth=${selectedDate}`, {
       headers: { accessToken: localStorage.getItem("accessToken") }
     })
     .then((response) => {

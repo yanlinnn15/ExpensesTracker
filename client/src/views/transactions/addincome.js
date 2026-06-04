@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';  
+﻿import React, { useState, useEffect } from 'react';  
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
-import axios from 'axios';  
+import api from 'src/api';  
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -64,7 +64,7 @@ function AddIncome({ open, onClose, getIncomes }) {
       navigate("/auth/login");
       return;
     }
-    axios.get("http://localhost:3001/cate/viewAll", {
+    api.get("/cate/viewAll", {
       headers: { accessToken: localStorage.getItem("accessToken") }
     }).then((response) => {
       if (response.data) {
@@ -78,7 +78,7 @@ function AddIncome({ open, onClose, getIncomes }) {
   }, []);
 
   const onSubmit = (data) => {    
-    axios.post("http://localhost:3001/trans/", data, {
+    api.post("/trans/", data, {
         headers: { accessToken: localStorage.getItem("accessToken") }
     }).then((response) => {
         console.log("Server response:", response.data);

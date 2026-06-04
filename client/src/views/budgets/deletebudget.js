@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {Modal, Box, Typography, Button, IconButton } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
-import axios from 'axios';
+import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { showsweetAlert } from '../../helpers/alert';
 
@@ -39,7 +39,7 @@ function DeleteBudget({ open, onClose, onBudgetDeleted, budgetID }) {
     const handleDelete = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.delete(`http://localhost:3001/budget/dlt/${budgetID}`, {
+            const response = await api.delete(`/budget/dlt/${budgetID}`, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             });
             onBudgetDeleted(budgetID); 

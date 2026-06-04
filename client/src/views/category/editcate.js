@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';  
+﻿import React, { useState, useEffect } from 'react';  
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
-import axios from 'axios';  
+import api from 'src/api';  
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -47,7 +47,7 @@ function EditCate({ open, onClose, onCateAdded, CateId, cate }) {
         setIsLoading(true);
       
         const token = localStorage.getItem("accessToken");
-        axios.get("http://localhost:3001/icon/view", {
+        api.get("/icon/view", {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -78,7 +78,7 @@ function EditCate({ open, onClose, onCateAdded, CateId, cate }) {
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {    
-            axios.patch(`http://localhost:3001/cate/edit/${CateId}`, data, {
+            api.patch(`/cate/edit/${CateId}`, data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

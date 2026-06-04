@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
+﻿import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from 'src/api';
 import {
   Avatar,
   Box,
@@ -32,7 +32,7 @@ const Profile = () => {
   const logout = async () => {
     if (localStorage.getItem('isGuest') === 'true') {
       try {
-        await axios.delete('http://localhost:3001/auth/guest');
+        await api.delete('/auth/guest');
       } catch (e) {
         console.error('Failed to delete guest account:', e);
       }

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';  
+﻿import React, { useState, useEffect } from 'react';  
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
-import axios from 'axios';  
+import api from 'src/api';  
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 
@@ -48,7 +48,7 @@ function AddCate({ open, onClose, onCateAdded}) {
         setIsLoading(true);
 
         const token = localStorage.getItem("accessToken");
-        axios.get("http://localhost:3001/icon/view", {
+        api.get("/icon/view", {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -78,7 +78,7 @@ function AddCate({ open, onClose, onCateAdded}) {
         },
         validationSchema: validationSchema,
         onSubmit: (data) => {  
-            axios.post('http://localhost:3001/cate/', data, {
+            api.post('/cate/', data, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             })
             .then((response) => {        

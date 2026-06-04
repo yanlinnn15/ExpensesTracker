@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import {
   Timeline,
@@ -12,7 +12,7 @@ import {
 } from '@mui/lab';
 import { Typography } from '@mui/material';
 import * as TablerIcons from "@tabler/icons-react"; 
-import axios from 'axios';
+import api from 'src/api';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
@@ -33,7 +33,7 @@ function RecentTransactions() {
       navigation('/auth/login');
       return;
     }
-    axios.get(`http://localhost:3001/trans/viewAll`, {
+    api.get(`/trans/viewAll`, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         }

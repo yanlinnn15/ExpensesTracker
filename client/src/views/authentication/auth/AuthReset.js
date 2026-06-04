@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+﻿import React, { useState, useEffect } from 'react';
+import api from 'src/api';
 import {
     Box,
     Typography,
@@ -32,7 +32,7 @@ function AuthReset({ title, subtitle }) {
 
     useEffect(() => {
         if (token && id) {
-            axios.post(`http://localhost:3001/auth/validate-reset-token?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`)
+            api.post(`/auth/validate-reset-token?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`)
                 .then(response => {
                     setMsg(response.data.message);
                 })
@@ -85,7 +85,7 @@ function AuthReset({ title, subtitle }) {
 
         const data = { password, confirmPassword };
         try{
-            const response = await axios.post(`http://localhost:3001/auth/forgotpass?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`, data);
+            const response = await api.post(`/auth/forgotpass?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`, data);
             const { message } = response.data;
             showsweetAlert('Success!', message, 'success');
             navigate('/auth/login');

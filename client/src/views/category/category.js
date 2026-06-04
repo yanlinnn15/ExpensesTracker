@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Typography, IconButton, Menu, MenuItem, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Box } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import { Container, Stack,  
@@ -9,7 +9,7 @@ import { Container, Stack,
 import { IconPencil, IconPlus, IconTrash, IconDotsVertical } from "@tabler/icons-react";
 import DashboardCard from '../../components/shared/DashboardCard';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from 'src/api';
 import * as TablerIcons from "@tabler/icons-react"; 
 import EditCate from './editcate';
 import AddCate from './addcate';
@@ -46,7 +46,7 @@ const Categories = () => {
         }
 
         const accessToken = localStorage.getItem("accessToken");
-        axios.get("http://localhost:3001/cate/viewAll", {
+        api.get("/cate/viewAll", {
             headers: { accessToken },
           })
           .then((response) => {
@@ -61,7 +61,7 @@ const Categories = () => {
       }, []);
 
       const handleCateAdded = (newCate) => {
-        axios.get('http://localhost:3001/cate/viewAll', {
+        api.get('/cate/viewAll', {
             headers: {
                 accessToken: localStorage.getItem("accessToken"),
             }

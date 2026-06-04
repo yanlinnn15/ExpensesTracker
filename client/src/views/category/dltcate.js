@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, IconButton } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
-import axios from 'axios';
+import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import TransferCate from './transfercate';
 import { SuccessDialog } from '../Dialog/success';
@@ -36,7 +36,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
         }
 
         setIsLoading(true);
-        axios.get(`http://localhost:3001/trans/count/${CateId}`, {
+        api.get(`/trans/count/${CateId}`, {
             headers: { accessToken: token }
         })
         .then((response) => {
@@ -69,7 +69,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
         setOpenTransModal(false);
         setIsLoading(true);
         try {
-            await axios.delete(`http://localhost:3001/cate/dlt/${CateId}`, {
+            await api.delete(`/cate/dlt/${CateId}`, {
                 headers: { accessToken: localStorage.getItem("accessToken") }
             });
             onCateDeleted(CateId); 

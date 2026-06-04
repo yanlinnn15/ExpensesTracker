@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, CircularProgress } from '@mui/material';
-import axios from 'axios';
+import api from 'src/api';
 import CustomTextField from '../../../components/forms/theme-elements/CustomTextField';
 import { Stack } from '@mui/system';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -25,7 +25,7 @@ function AuthRegister({ title, subtitle, subtext }) {
     const onSubmit = (data, { setSubmitting }) => {
         setLoading(true); // Start loading indicator
 
-        axios.post("http://localhost:3001/auth", data)
+        api.post("/auth", data)
             .then((response) => {
                 const { message } = response.data;
                 showsweetAlert('Success!', message, 'success');

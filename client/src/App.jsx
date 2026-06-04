@@ -3,30 +3,19 @@ import { useRoutes } from 'react-router-dom';
 import Router from './routes/Router';
 import { AuthContext } from './helpers/AuthContext';
 import { useState, useEffect } from 'react';
-import axios from 'axios'; 
+import api from './api';
 import { baselightTheme } from "./theme/DefaultColors";
-
-// Setup axios interceptor once at module level
-axios.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem("accessToken");
-  if (accessToken) {
-    config.headers.accessToken = accessToken;
-  }
-  return config;
-});
 
 const App = () => {
   const [authState, setAuthState] = useState({ fname: "", id: 0, status: false });
-  const [error, setError] = useState(null); 
-  const [loading, setLoading] = useState(true);;
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
 
-    if(token){
-      axios.get('http://localhost:3001/auth/auth', {
-        headers: { accessToken: token }
-      })
+    if (token) {
+      api.get('/auth/auth')
         .then((response) => {
           if (response.data.error) {
             setAuthState({ ...authState, status: false });
@@ -54,7 +43,6 @@ const App = () => {
     } else {
       setLoading(false);
     }
-
   }, []);
 
   const routing = useRoutes(Router);

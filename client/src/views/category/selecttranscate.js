@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardActionArea, Grid, Modal, Box, Typography, Button, IconButton, Select, MenuItem } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
-import axios from 'axios';
+import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import * as TablerIcons from "@tabler/icons-react"; 
 
@@ -38,7 +38,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
             return;
         }
 
-        axios.get(`http://localhost:3001/cate/someCate/${CateId}`, {
+        api.get(`/cate/someCate/${CateId}`, {
             headers: { accessToken: token }
         })
         .then(response => setCategories(response.data))
@@ -58,7 +58,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
             console.log(selectedTransactions)
             const migrationPromises =selectedTransactions.map((transId) => {
                 console.log(transId)
-                return axios.patch(`http://localhost:3001/trans/edit/${transId}`, {
+                return api.patch(`/trans/edit/${transId}`, {
                     CategoryId: newCategoryId,
                 }, {
                     headers: { accessToken: token }

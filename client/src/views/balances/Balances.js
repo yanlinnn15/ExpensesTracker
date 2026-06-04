@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
@@ -21,7 +21,7 @@ import PageContainer from 'src/components/container/PageContainer';
 import DashboardCard from '../../components/shared/DashboardCard';
 import { IconCoin, IconFilter, IconChevronRight } from "@tabler/icons-react";
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from 'src/api';
 import { isAuthenticated } from 'src/helpers/authCheck';
 
 const Balances = () => {
@@ -49,7 +49,7 @@ const Balances = () => {
       balance: 0.00,
     }));
 
-    axios.get("http://localhost:3001/trans/viewMonth", {
+    api.get("/trans/viewMonth", {
       headers: { accessToken: localStorage.getItem('accessToken') }
     })
       .then((response) => {
