@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import CustomTextField from '../../../components/forms/theme-elements/CustomTextField';
 import { Stack } from '@mui/system';
@@ -13,7 +13,6 @@ function AuthRegister({ title, subtitle, subtext }) {
     
     const navigate = useNavigate();
     const [alertMessage, setAlertMessage] = useState("");
-    const [link, setLink] = useState(""); // Added state for link
     const [loading, setLoading] = useState(false); // Track loading state
 
     const validationSchema = Yup.object().shape({
@@ -28,16 +27,12 @@ function AuthRegister({ title, subtitle, subtext }) {
 
         axios.post("http://localhost:3001/auth", data)
             .then((response) => {
-                const { message, showDialog, showAlert, link: responseLink } = response.data;
-
-                if (showDialog) {
-                    showsweetAlert('Success!', message, 'success');
-
-                } else if (showAlert) {
-                    setAlertMessage(`${message} Click `);
-                    setLink(responseLink); 
-                }
-                
+                const { message } = response.data;
+                showsweetAlert('Success!', message, 'success');
+                // Redirect to login after successful registration
+                setTimeout(() => {
+                    navigate('/auth/login');
+                }, 1500);
             })
             .catch((error) => {
                 console.error('Registration error:', error);
@@ -58,14 +53,6 @@ function AuthRegister({ title, subtitle, subtext }) {
             )}
 
             {subtext}
-
-            {alertMessage && (
-                <Alert severity="warning" onClose={() => setAlertMessage('')}>
-                    <Typography>
-                        {alertMessage} {link && <a href={link} style={{ marginLeft: '8px' }}>Here</a>}
-                    </Typography>
-                </Alert>
-            )}
 
             <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
                 {({ isSubmitting }) => (

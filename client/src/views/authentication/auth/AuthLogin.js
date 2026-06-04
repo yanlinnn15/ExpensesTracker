@@ -44,11 +44,6 @@ function AuthLogin({ title, subtitle, subtext }) {
                         status: true
                     });
                     navigate('/');
-                } else {                    
-                    const verificationMessage = `Please verify your email. Click here to verify: <a href='http://localhost:5173/auth/verify'>Verify Email</a>`;
-                    setAlertMessage(verificationMessage);
-                    setAlertSeverity("error");
-                    setOpen(true);
                 }
             })
             .catch((error) => {
@@ -64,6 +59,25 @@ function AuthLogin({ title, subtitle, subtext }) {
                 }
                 setOpen(true);
             });
+    };
+
+    const ContinueAsGuest = async () => {
+        try {
+            const response = await axios.post("http://localhost:3001/auth/guest");
+            localStorage.setItem("accessToken", response.data.token);
+            localStorage.setItem("isGuest", "true");
+            setAuthState({
+                fname: "Guest",
+                id: response.data.id,
+                status: true,
+                isGuest: true,
+            });
+            navigate('/');
+        } catch (error) {
+            setAlertMessage("Failed to start guest session. Please try again.");
+            setAlertSeverity("error");
+            setOpen(true);
+        }
     };
 
     return (
@@ -94,17 +108,6 @@ function AuthLogin({ title, subtitle, subtext }) {
                     <CustomTextField id="password" type="password" variant="outlined" onChange={(event) => setPassword(event.target.value)} fullWidth />
                 </Box>
                 <Stack justifyContent="space-between" direction="row" alignItems="center" my={2}>
-                    <Typography
-                        component={Link}
-                        to="/auth/forgotpasslink"
-                        fontWeight="500"
-                        sx={{
-                            textDecoration: 'none',
-                            color: 'primary.main',
-                        }}
-                    >
-                        Forgot Password?
-                    </Typography>
                 </Stack>
             </Stack>
             <Box>
@@ -116,6 +119,17 @@ function AuthLogin({ title, subtitle, subtext }) {
                     onClick={Login}
                 >
                     Sign In
+                </Button>
+            </Box>
+            <Box mt={2}>
+                <Button
+                    color="secondary"
+                    variant="outlined"
+                    size="large"
+                    fullWidth
+                    onClick={ContinueAsGuest}
+                >
+                    Continue as Guest
                 </Button>
             </Box>
             {subtitle}

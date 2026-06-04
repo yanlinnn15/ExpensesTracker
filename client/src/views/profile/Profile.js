@@ -7,6 +7,7 @@ import axios from 'axios';
 import { AuthContext } from '../../helpers/AuthContext';
 import * as Yup from 'yup';
 import { showToast } from '../../helpers/showtoast';
+import { isAuthenticated, isGuest } from 'src/helpers/authCheck';
 
 
 const Profile = () => {
@@ -27,29 +28,38 @@ const Profile = () => {
   const [dialogMessage, setDialogMessage] = useState(null);
 
   useEffect(() => {
-    if(!localStorage.getItem('accessToken')){
-      navigate('auth/login')
+    if(!isAuthenticated()){
+      navigate('/auth/login')
       return;
     }
 
-    axios.get(`http://localhost:3001/auth/profile/${id}`, 
+    axios.get(`http://localhost:3001/auth/profile/${id}`,
       {headers: {accessToken: localStorage.getItem("accessToken")}})
       .then((response) => {
         setFirstName(response.data.fName);
         setLastName(response.data.lName);
-        setEmail(response.data.email);
+        setEmail(isGuest() ? "Guest Account" : response.data.email);
       })
       .catch((error) => {
         setErrorMsg(error.message);
       });
 
-  }, [navigate])
+  }, [])
 
   const handleSave = async () => {
     setIsLoading(true);
   
     if (!firstName || !lastName) {
       setErrorMsg("First name and last name are required.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Guests cannot save changes
+    if(isGuest()) {
+      setAlertMessage("Guest users cannot modify profile information. Please register to save changes.");
+      setAlertSeverity("info");
+      setOpen(true);
       setIsLoading(false);
       return;
     }
@@ -99,10 +109,18 @@ const Profile = () => {
   };
 
   const handleDialogClose = () => {
-    setDialogOpen(false);
+    setOpenResetModal(false);
   };
 
   const handleResetPassword = () => {
+    // Guests cannot reset password
+    if(isGuest()) {
+      setAlertMessage("Guest users cannot reset passwords. Please register an account.");
+      setAlertSeverity("info");
+      setOpen(true);
+      setOpenResetModal(false);
+      return;
+    }
 
     try {
       validationSchema.validateSync({ newPassword, confirmPassword });
@@ -191,10 +209,10 @@ const Profile = () => {
             </Grid>
             <Grid item xs={12}>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <Button variant="contained" color="primary" onClick={handleSave} disabled={isLoading}>
+                <Button variant="contained" color="primary" onClick={handleSave} disabled={isLoading || isGuest()}>
                   {isLoading ? "Saving..." : "Save"}
                 </Button>
-                <Button variant="outlined" color="primary" onClick={handleOpenResetModal}>
+                <Button variant="outlined" color="primary" onClick={handleOpenResetModal} disabled={isGuest()}>
                   Reset Password
                 </Button>
               </Box>

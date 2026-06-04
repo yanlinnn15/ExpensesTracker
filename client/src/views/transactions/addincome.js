@@ -5,7 +5,8 @@ import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';  
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -59,22 +60,22 @@ function AddIncome({ open, onClose, getIncomes }) {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("accessToken")) {
-      navigate("/auth/login");  
-    } else {
-      axios.get("http://localhost:3001/cate/viewAll", {
-        headers: { accessToken: localStorage.getItem("accessToken") }
-      }).then((response) => {
-        if (response.data) {
-          setCate(response.data.cateincome);  
-        }
-      }).catch((error) => {
-        const message = error.response ? error.response.data.message : error.message;
-        setDialogMessage(message);
-        setDialogOpen(true);
-      });
+    if (!isAuthenticated()) {
+      navigate("/auth/login");
+      return;
     }
-  }, [navigate]);
+    axios.get("http://localhost:3001/cate/viewAll", {
+      headers: { accessToken: localStorage.getItem("accessToken") }
+    }).then((response) => {
+      if (response.data) {
+        setCate(response.data.cateincome);
+      }
+    }).catch((error) => {
+      const message = error.response ? error.response.data.message : error.message;
+      setDialogMessage(message);
+      setDialogOpen(true);
+    });
+  }, []);
 
   const onSubmit = (data) => {    
     axios.post("http://localhost:3001/trans/", data, {

@@ -17,6 +17,7 @@ import { IconGridDots } from "@tabler/icons-react";
 import getLast12Months from '../../func/func12m';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const TransOverview = () => {
   let navigate = useNavigate();
@@ -40,24 +41,24 @@ const TransOverview = () => {
   const handleTabChange = (event, newValue) => setTabIndex(newValue);
 
   useEffect(() => {
-    if (!localStorage.getItem("accessToken")) {
+    if (!isAuthenticated()) {
       navigate('/auth/login');
-    } else {
-      axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
-        headers: { accessToken: localStorage.getItem("accessToken") }
-      })
-      .then((response) => {
-        const incomeData = response.data.monthly.filter(item => item.type === true);
-        const expenseData = response.data.monthly.filter(item => item.type === false);
-
-        setIncome(incomeData);
-        setExpense(expenseData);
-      })
-      .catch((error) => {
-        setErrorMsg(error.response ? error.response.data.message : "Server Error");
-      });
+      return;
     }
-  }, [selectedDate, navigate]);
+    axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+      headers: { accessToken: localStorage.getItem("accessToken") }
+    })
+    .then((response) => {
+      const incomeData = response.data.monthly.filter(item => item.type === true);
+      const expenseData = response.data.monthly.filter(item => item.type === false);
+
+      setIncome(incomeData);
+      setExpense(expenseData);
+    })
+    .catch((error) => {
+      setErrorMsg(error.response ? error.response.data.message : "Server Error");
+    });
+  }, [selectedDate]);
 
   const data = {
     income: {

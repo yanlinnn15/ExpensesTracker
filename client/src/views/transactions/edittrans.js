@@ -5,7 +5,8 @@ import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';  
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 // Function to render icons dynamically
 const renderIcon = (iconName) => {
@@ -51,14 +52,14 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
             return;
         }
-      
+        
         setIsLoading(true);
       
+        const token = localStorage.getItem("accessToken");
         Promise.all([
             axios.get("http://localhost:3001/cate/viewAll", {
                 headers: { accessToken: token }

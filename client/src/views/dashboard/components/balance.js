@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import getLast12Months from '../../func/func12m';
 import axios from 'axios';
-import * as TablerIcons from "@tabler/icons-react"; 
+import * as TablerIcons from "@tabler/icons-react";
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -29,26 +30,26 @@ const BalanceOverview = () => {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("accessToken")) {
+    if (!isAuthenticated()) {
       navigate('/auth/login');
-    } else {
-      axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
-        headers: { accessToken: localStorage.getItem("accessToken") }
-      })
-      .then((response) => {
-        if (response.data) {
-          setTtlIncome(response.data.ttlIncome); 
-          setTtlExpense(response.data.ttlExpense); 
-          setTtlBalance(parseFloat(response.data.ttlIncome - response.data.ttlExpense).toFixed(2));
-        } else {
-          alert('Unexpected response format. Please try again.');
-        }
-      })
-      .catch((error) => {
-        setErrorMsg(error.response ? error.response.data.message : "Server Error");
-      });
+      return;
     }
-  }, [selectedDate, navigate]);
+    axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+      headers: { accessToken: localStorage.getItem("accessToken") }
+    })
+    .then((response) => {
+      if (response.data) {
+        setTtlIncome(response.data.ttlIncome);
+        setTtlExpense(response.data.ttlExpense);
+        setTtlBalance(parseFloat(response.data.ttlIncome - response.data.ttlExpense).toFixed(2));
+      } else {
+        alert('Unexpected response format. Please try again.');
+      }
+    })
+    .catch((error) => {
+      setErrorMsg(error.response ? error.response.data.message : "Server Error");
+    });
+  }, [selectedDate]);
 
   const stats = [
     {

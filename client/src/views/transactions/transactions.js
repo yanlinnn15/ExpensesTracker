@@ -29,6 +29,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import AddTransactionModal from './addtrans';
 import EditTrans from './edittrans';
 import DeleteTrans from './dlttrans';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const renderIcon = (iconName) => {
     const IconComponent = TablerIcons[iconName]; 
@@ -173,41 +174,41 @@ const Transactions = () => {
     }, [])
     
     useEffect(() => {
-        if (!localStorage.getItem("accessToken")) {
+        if (!isAuthenticated()) {
             navigation('/auth/login');
-        } else {
-
-            axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
-                headers: {
-                    accessToken: localStorage.getItem("accessToken"),
-                }
-            })
-            .then((response) => {
-                if (response.data) {
-                    const transactionsByDate = response.data.transaction.reduce((acc, tran) => {
-                        const date = tran.date;
-                        if (!acc[date]) {
-                            acc[date] = { date, transactions: [] };
-                        }
-                        acc[date].transactions.push(tran);
-                        return acc;
-                    }, {});
-
-                    setTrans(Object.values(transactionsByDate)); // Convert object to array
-                    setTtlIncome(response.data.ttlIncome); 
-                    setTtlExpense(response.data.ttlExpense); 
-                } else {
-                    alert('Unexpected response format. Please try again.');
-                }
-            }).catch((error) => {
-                if (error.response) {
-                    setErrorMsg(error.response.data.message);
-                } else {
-                    setErrorMsg("Server Error");
-                }
-            });
+            return;
         }
-    }, [selectedDate, navigation]);
+
+        axios.get(`http://localhost:3001/trans/viewAll?mth=${selectedDate}`, {
+            headers: {
+                accessToken: localStorage.getItem("accessToken"),
+            }
+        })
+        .then((response) => {
+            if (response.data) {
+                const transactionsByDate = response.data.transaction.reduce((acc, tran) => {
+                    const date = tran.date;
+                    if (!acc[date]) {
+                        acc[date] = { date, transactions: [] };
+                    }
+                    acc[date].transactions.push(tran);
+                    return acc;
+                }, {});
+
+                setTrans(Object.values(transactionsByDate));
+                setTtlIncome(response.data.ttlIncome);
+                setTtlExpense(response.data.ttlExpense);
+            } else {
+                alert('Unexpected response format. Please try again.');
+            }
+        }).catch((error) => {
+            if (error.response) {
+                setErrorMsg(error.response.data.message);
+            } else {
+                setErrorMsg("Server Error");
+            }
+        });
+    }, [selectedDate]);
 
     return (
         <PageContainer title="Transactions" description="Balance Page">

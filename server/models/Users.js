@@ -18,7 +18,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         password:{
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
+        },
+        isGuest:{
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
         },
         active:{
             type: DataTypes.BOOLEAN,

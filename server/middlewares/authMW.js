@@ -13,8 +13,8 @@ const validateToken = async (req,res,next) => {
 
         if(!checkActive)
             return res.status(403).json({ message: 'Account is inactive' });
-        
-        req.user = token;
+
+        req.user = { ...token, isGuest: token.isGuest || false };
         return next();
         
             

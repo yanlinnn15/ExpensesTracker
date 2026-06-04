@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const validationSchema = Yup.object({
     amount: Yup.number()
@@ -19,14 +20,14 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
             return;
         }
-
+        
         setIsLoading(true);
 
+        const token = localStorage.getItem("accessToken");
         axios.get("http://localhost:3001/cate/viewAll", {
             headers: { accessToken: token }
         })

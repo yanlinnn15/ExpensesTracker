@@ -15,6 +15,7 @@ import EditCate from './editcate';
 import AddCate from './addcate';
 import DeleteCate from './dltcate';
 import { showToast } from '../../helpers/showtoast';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 
 const renderIcon = (iconName) => {
@@ -35,16 +36,16 @@ const Categories = () => {
     const [openAddModal, setOpenAddModal] = useState(false);
     const [openDeleteDialog, setDeleteDialogOpen] = useState(false);
     const [selectedType, setSelectedType] = useState("")
-
-
+    const [errorMsg, setErrorMsg] = useState(null);
     let navigator = useNavigate();
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) {
+        if (!isAuthenticated()) {
           navigator('/auth/login');
           return;
         }
+
+        const accessToken = localStorage.getItem("accessToken");
         axios.get("http://localhost:3001/cate/viewAll", {
             headers: { accessToken },
           })
@@ -57,7 +58,7 @@ const Categories = () => {
           .catch((error) => {
             setErrorMsg(error.message);
           });
-      }, [navigator]);
+      }, []);
 
       const handleCateAdded = (newCate) => {
         axios.get('http://localhost:3001/cate/viewAll', {

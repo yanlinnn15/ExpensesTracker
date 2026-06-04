@@ -15,6 +15,7 @@ import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -28,10 +29,11 @@ function RecentTransactions() {
   let navigation = useNavigate();
 
   useEffect(() => {
-    if (!localStorage.getItem("accessToken")) {
+    if (!isAuthenticated()) {
       navigation('/auth/login');
-    } else {
-      axios.get(`http://localhost:3001/trans/viewAll`, {
+      return;
+    }
+    axios.get(`http://localhost:3001/trans/viewAll`, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         }
@@ -49,8 +51,7 @@ function RecentTransactions() {
             setErrorMsg("Server Error");
           }
         });
-    }
-  }, [navigation]);
+  }, []);
 
   return (
     <DashboardCard

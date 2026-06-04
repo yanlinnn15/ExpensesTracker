@@ -22,6 +22,7 @@ import AddBudget from './addbudget';
 import EditBudget from './editbudget';
 import DeleteBudget from './deletebudget';
 import { showToast } from '../../helpers/showtoast';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 function Budgets() {
   const theme = useTheme();
@@ -39,11 +40,12 @@ function Budgets() {
   const navigator = useNavigate();
 
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
+    if (!isAuthenticated()) {
       navigator('/auth/login');
       return;
     }
+
+    const accessToken = localStorage.getItem("accessToken");
     axios.get("http://localhost:3001/budget/viewAll", {
       headers: { accessToken },
     })
@@ -63,7 +65,7 @@ function Budgets() {
     .catch((error) => {
       setErrorMsg(error.message);
     });
-  }, [navigator]);
+  }, []);
 
   const handleBudgetAdded = (newCate) => {
     axios.get('http://localhost:3001/budget/viewAll', {

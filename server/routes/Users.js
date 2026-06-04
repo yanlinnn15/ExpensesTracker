@@ -97,40 +97,28 @@ router.post("/", async (req, res) => {
                                 lName: lname,
                                 email:email,
                                 password:hash,
-                                active:true   
+                                active:true,
+                                verify:true   
                             });
 
-            const verifyToken = crypto.randomBytes(32).toString('hex');    
-            const verifyTokenEx = Date.now() + 3600000; // 1 hour expiration
-            const verificationUrl = `https://localhost:5173/verify?token=${verifyToken}&id=${user.id}`;
+            // Create default categories for new user
+            await Categories.bulkCreate(
+                [                
+                        { name: 'Salary', is_income:1, UserId:user.id, IconId:1 },
+                        { name: 'Part Time', is_income:1, UserId:user.id, IconId:2 },
+                        { name: 'Food', is_income:0, UserId:user.id, IconId:6 },
+                        { name: 'Transport', is_income:0, UserId:user.id, IconId:9 },
+                        { name: 'Essentials', is_income:0, UserId:user.id, IconId:8 },
+                        { name: 'Shopping', is_income:0, UserId:user.id, IconId:7 },
+                ]
+            );
 
-            await Users.update({
-                verifyToken:verifyToken,
-                verifyTokenEx:verifyTokenEx,    
-            },
-            {
-              where: {id:user.id}  
-            });
-            await sendVerificationEmail(user.email, verificationUrl);
-            return res.status(201).json({ message: "Sign Up Successful. We have sent you the verify email!", showDialog: true });
+            return res.status(201).json({ message: "Sign Up Successful. Please log in to your account.", showDialog: true });
    
         }else{
-            const verify = await Users.findOne({where: {email:email, verify:true}});
-
-            if(verify){
-                return res.status(200).json({
-                    message: "Account exists. Please go to Log In Page.",
-                    link: "http://localhost:5173/auth/login",
-                    showAlert: true
-                });
-            }else{
-                return res.status(200).json({
-                    message: "Account exists. Please verify your email.",
-                    link: "http://localhost:5173/auth/verification",
-                    showAlert: true
-                });
-
-            }
+            return res.status(400).json({
+                message: "An account with this email already exists. Please log in."
+            });
         }
 
     }catch(error){
@@ -358,6 +346,49 @@ router.post('/forgotpass', async (req, res) => {
 })
 
 
+router.post("/guest", async (req, res) => {
+    try {
+        const uid = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        const user = await Users.create({
+            fName: 'Guest',
+            lName: 'User',
+            email: `${uid}@guest.local`,
+            password: null,
+            active: true,
+            verify: true,
+            isGuest: true,
+        });
+
+        await Categories.bulkCreate([
+            { name: 'Salary',     is_income: 1, UserId: user.id, IconId: 1 },
+            { name: 'Part Time',  is_income: 1, UserId: user.id, IconId: 2 },
+            { name: 'Food',       is_income: 0, UserId: user.id, IconId: 6 },
+            { name: 'Transport',  is_income: 0, UserId: user.id, IconId: 9 },
+            { name: 'Essentials', is_income: 0, UserId: user.id, IconId: 8 },
+            { name: 'Shopping',   is_income: 0, UserId: user.id, IconId: 7 },
+        ]);
+
+        const accessToken = sign({ fname: 'Guest', id: user.id, isGuest: true }, "important");
+        res.json({ token: accessToken, fname: 'Guest', id: user.id, isGuest: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+router.delete("/guest", validateToken, async (req, res) => {
+    try {
+        if (!req.user.isGuest)
+            return res.status(403).json({ message: "Not a guest account" });
+
+        await Users.destroy({ where: { id: req.user.id, isGuest: true } });
+        res.sendStatus(200);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 router.post("/login", async (req,res) =>{
 
     //LogIn
@@ -366,26 +397,19 @@ router.post("/login", async (req,res) =>{
 
    try{
         if(user){
-            const userExist = await Users.findOne({where: {email:email, verify:true}});
+            const userActive = await Users.findOne({where: {email:email, active:true}});
 
-            if(userExist){
-                const userActive = await Users.findOne({where: {email:email, verify:true, active:true}});
-
-                if(userActive){
-                    bcrypt.compare(password, user.password).then((match) => {
-                        if(match){
-                            const accessToken = sign({fname:user.fName, id:user.id}, "important");
-                            res.json({token:accessToken, fname:user.fName, id:user.id});
-                        }else{
-                            res.status(400).json({message: "Invalid Email or Password!"});
-                        }
-                    });
-                }else{
-                    res.status(400).json({message: "Your account is Inactive."});
-                }
-
+            if(userActive){
+                bcrypt.compare(password, user.password).then((match) => {
+                    if(match){
+                        const accessToken = sign({fname:user.fName, id:user.id}, "important");
+                        res.json({token:accessToken, fname:user.fName, id:user.id});
+                    }else{
+                        res.status(400).json({message: "Invalid Email or Password!"});
+                    }
+                });
             }else{
-                res.status(400).json({message: "Please verify your email. Click here to verify: <a href='http://localhost:5173/auth/verification'>Verify Email "});
+                res.status(400).json({message: "Your account is Inactive."});
             }
         }else{
             res.status(400).json({message: "Invalid Email or Password!"});

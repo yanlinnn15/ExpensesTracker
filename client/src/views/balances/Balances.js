@@ -15,12 +15,14 @@ import {
   CardContent,
   Stack,
   Box,
+  Alert,
 } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import DashboardCard from '../../components/shared/DashboardCard';
 import { IconCoin, IconFilter, IconChevronRight } from "@tabler/icons-react";
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const Balances = () => {
   const [errormsg, setErrorMsg] = useState(null);
@@ -35,7 +37,7 @@ const Balances = () => {
   const currentMonth = new Date().getMonth() + 1;
 
   useEffect(() => {
-    if (!localStorage.getItem('accessToken')) {
+    if (!isAuthenticated()) {
       navigate('/auth/login');
       return;
     }
@@ -72,7 +74,7 @@ const Balances = () => {
         });
 
         monthlyData.forEach(monthData => {
-          monthData.balance = (parseFloat(monthData.income) - parseFloat(monthData.expense)).toFixed(2); // Format to 2 decimal places
+          monthData.balance = (parseFloat(monthData.income) - parseFloat(monthData.expense)).toFixed(2);
         });
 
         setMonthlyData(monthlyData);
@@ -86,6 +88,7 @@ const Balances = () => {
   return (
     <PageContainer title="Balances" description="Balance Page">
       <DashboardCard title="Balances">
+        {errormsg && <Alert severity="warning" sx={{ mb: 2 }}>{errormsg}</Alert>}
         <Container maxWidth="lg">
           <Grid container spacing={3} justifyContent="center">
             <Grid item xs={12}>

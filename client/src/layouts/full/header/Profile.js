@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import {
   Avatar,
   Box,
@@ -28,10 +29,18 @@ const Profile = () => {
     setAnchorEl2(null);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (localStorage.getItem('isGuest') === 'true') {
+      try {
+        await axios.delete('http://localhost:3001/auth/guest');
+      } catch (e) {
+        console.error('Failed to delete guest account:', e);
+      }
+    }
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('isGuest');
     setAuthState({ fname: "", id: 0, status: false });
-    navigate("/auth/login")
+    navigate("/auth/login");
   };
 
   return (

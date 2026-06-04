@@ -6,6 +6,7 @@ import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import * as TablerIcons from "@tabler/icons-react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 import { showsweetAlert } from '../../helpers/alert';
 
 const renderIcon = (iconName) => {
@@ -42,25 +43,25 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
             return;
         }
-      
+
         setIsLoading(true);
-      
+
+        const token = localStorage.getItem("accessToken");
         axios.get("http://localhost:3001/cate/viewAll", {
             headers: { accessToken: token }
         })
         .then((response) => {
-            setCate(response.data.catebudget || []);  
+            setCate(response.data.catebudget || []);
             setIsLoading(false);
         })
         .catch((error) => {
             handleError(error);
         });
-    }, [navigate, open]);
+    }, [open]);
 
     const handleError = (error) => {
         const message = error.response 

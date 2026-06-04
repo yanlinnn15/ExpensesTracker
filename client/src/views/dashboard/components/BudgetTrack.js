@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 
 
@@ -16,11 +17,12 @@ const BudgetTracker = () => {
 
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) {
+        if (!isAuthenticated()) {
           navigator('/auth/login');
           return;
         }
+        
+        const accessToken = localStorage.getItem("accessToken");
         axios.get("http://localhost:3001/budget/viewAll", {
           headers: { accessToken },
         })
@@ -30,9 +32,9 @@ const BudgetTracker = () => {
           }
         })
         .catch((error) => {
-          setErrorMsg(error.message);
+          console.error('Budget fetch error:', error);
         });
-      }, [navigator]);
+      }, []);
       
       return (
         <DashboardCard title="Yearly Budget Overview" sx={{ p: 0, mb: 2, width: '100%' }}>
