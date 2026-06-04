@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
@@ -49,9 +49,7 @@ const Balances = () => {
       balance: 0.00,
     }));
 
-    api.get("/trans/viewMonth", {
-      headers: { accessToken: localStorage.getItem('accessToken') }
-    })
+    api.get("/trans/viewMonth")
       .then((response) => {
         setTtlExpense(response.data.ttlExpense);
         setTtlIncome(response.data.ttlIncome);

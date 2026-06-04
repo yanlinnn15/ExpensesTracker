@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
@@ -74,11 +74,7 @@ const Transactions = () => {
     const handleExpenseAdded = (newTransaction) => {
         const yearMonth = newTransaction.date.slice(0, 7);
         setSelectedDate(yearMonth);
-        api.get(`/trans/viewAll?mth=${selectedDate}`, {
-            headers: {
-                accessToken: localStorage.getItem("accessToken"),
-            }
-        })
+        api.get(`/trans/viewAll?mth=${selectedDate}`)
         .then((response) => {
             if (response.data) {
                 const transactionsByDate = response.data.transaction.reduce((acc, tran) => {
@@ -179,11 +175,7 @@ const Transactions = () => {
             return;
         }
 
-        api.get(`/trans/viewAll?mth=${selectedDate}`, {
-            headers: {
-                accessToken: localStorage.getItem("accessToken"),
-            }
-        })
+        api.get(`/trans/viewAll?mth=${selectedDate}`)
         .then((response) => {
             if (response.data) {
                 const transactionsByDate = response.data.transaction.reduce((acc, tran) => {

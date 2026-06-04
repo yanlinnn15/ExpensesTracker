@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, IconButton, Menu, MenuItem, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Box } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import { Container, Stack,  
@@ -44,11 +44,7 @@ const Categories = () => {
           navigator('/auth/login');
           return;
         }
-
-        const accessToken = localStorage.getItem("accessToken");
-        api.get("/cate/viewAll", {
-            headers: { accessToken },
-          })
+        api.get("/cate/viewAll")
           .then((response) => {
             if (response.data) {
               setCateIncome(response.data.cateincome);
@@ -61,11 +57,7 @@ const Categories = () => {
       }, []);
 
       const handleCateAdded = (newCate) => {
-        api.get('/cate/viewAll', {
-            headers: {
-                accessToken: localStorage.getItem("accessToken"),
-            }
-        })
+        api.get('/cate/viewAll')
         .then((response) => {
             if (response.data) {
               setCateIncome(response.data.cateincome);

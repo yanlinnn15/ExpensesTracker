@@ -1,4 +1,4 @@
-﻿import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Select, MenuItem, Typography, LinearProgress, Box, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import DashboardCard from '../../../components/shared/DashboardCard';
@@ -21,11 +21,7 @@ const BudgetTracker = () => {
           navigator('/auth/login');
           return;
         }
-        
-        const accessToken = localStorage.getItem("accessToken");
-        api.get("/budget/viewAll", {
-          headers: { accessToken },
-        })
+        api.get("/budget/viewAll")
         .then((response) => {
           if (response.data) {
             setBudgetTrans(response.data.budgetTrans);

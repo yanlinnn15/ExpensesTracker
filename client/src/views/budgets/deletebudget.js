@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {Modal, Box, Typography, Button, IconButton } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 import { showsweetAlert } from '../../helpers/alert';
 
 const style = {
@@ -23,8 +24,7 @@ function DeleteBudget({ open, onClose, onBudgetDeleted, budgetID }) {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
         }
     }, [navigate]);
@@ -39,9 +39,7 @@ function DeleteBudget({ open, onClose, onBudgetDeleted, budgetID }) {
     const handleDelete = async () => {
         setIsLoading(true);
         try {
-            const response = await api.delete(`/budget/dlt/${budgetID}`, {
-                headers: { accessToken: localStorage.getItem("accessToken") }
-            });
+            const response = await api.delete(`/budget/dlt/${budgetID}`);
             onBudgetDeleted(budgetID); 
             onClose();
         } catch (error) {

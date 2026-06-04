@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Typography,
   IconButton,
@@ -44,11 +44,7 @@ function Budgets() {
       navigator('/auth/login');
       return;
     }
-
-    const accessToken = localStorage.getItem("accessToken");
-    api.get("/budget/viewAll", {
-      headers: { accessToken },
-    })
+    api.get("/budget/viewAll")
     .then((response) => {
       if (response.data) {
         console.log(response.data.totalAmount)
@@ -68,11 +64,7 @@ function Budgets() {
   }, []);
 
   const handleBudgetAdded = (newCate) => {
-    api.get('/budget/viewAll', {
-      headers: {
-        accessToken: localStorage.getItem("accessToken"),
-      }
-    })
+    api.get('/budget/viewAll')
     .then((response) => {
       if (response.data) {
         setTtlBudget(

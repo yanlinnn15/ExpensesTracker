@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, Button, IconButton, Checkbox, FormControlLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 import * as TablerIcons from "@tabler/icons-react"; 
 import SelectTransCate from './selecttranscate';
 
@@ -32,15 +33,12 @@ function TransferCate({ open, onClose, CateId, onProcessing }) {
 
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
             return;
         }
 
-        api.get(`/trans/count/${CateId}`, {
-            headers: { accessToken: token }
-        })
+        api.get(`/trans/count/${CateId}`)
         .then((response) => {
             const { countT, cate } = response.data; 
             setCount(Number(countT));

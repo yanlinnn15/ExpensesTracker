@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';  
+import React, { useState, useEffect } from 'react';  
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -45,11 +45,7 @@ function EditCate({ open, onClose, onCateAdded, CateId, cate }) {
         }
         
         setIsLoading(true);
-      
-        const token = localStorage.getItem("accessToken");
-        api.get("/icon/view", {
-            headers: { accessToken: token }
-        })
+        api.get("/icon/view")
         .then((response) => {
             setIcon(response.data || []);  
             setIsLoading(false);
@@ -78,9 +74,7 @@ function EditCate({ open, onClose, onCateAdded, CateId, cate }) {
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {    
-            api.patch(`/cate/edit/${CateId}`, data, {
-                headers: { accessToken: localStorage.getItem("accessToken") }
-            })
+            api.patch(`/cate/edit/${CateId}`, data)
             .then((response) => {        
                 if (response.data && response.data.category) {
                     const updatedCategory = {

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';  
+import React, { useState, useEffect } from 'react';  
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -64,9 +64,7 @@ function AddIncome({ open, onClose, getIncomes }) {
       navigate("/auth/login");
       return;
     }
-    api.get("/cate/viewAll", {
-      headers: { accessToken: localStorage.getItem("accessToken") }
-    }).then((response) => {
+    api.get("/cate/viewAll").then((response) => {
       if (response.data) {
         setCate(response.data.cateincome);
       }
@@ -78,9 +76,7 @@ function AddIncome({ open, onClose, getIncomes }) {
   }, []);
 
   const onSubmit = (data) => {    
-    api.post("/trans/", data, {
-        headers: { accessToken: localStorage.getItem("accessToken") }
-    }).then((response) => {
+    api.post("/trans/", data).then((response) => {
         console.log("Server response:", response.data);
         
         if (response.data && response.data.trans) {

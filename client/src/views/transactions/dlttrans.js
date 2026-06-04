@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, IconButton } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 
 const style = {
     position: 'absolute',
@@ -24,8 +25,7 @@ function DeleteTrans({ open, onClose, onTransactionDeleted, transactionId }) {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
         }
     }, [navigate]);
@@ -42,9 +42,7 @@ function DeleteTrans({ open, onClose, onTransactionDeleted, transactionId }) {
     const handleDelete = async () => {
         setIsLoading(true);
         try {
-            const response = await api.delete(`/trans/dlt/${transactionId}`, {
-                headers: { accessToken: localStorage.getItem("accessToken") }
-            });
+            const response = await api.delete(`/trans/dlt/${transactionId}`);
             onTransactionDeleted(transactionId); 
             onClose();
         } catch (error) {

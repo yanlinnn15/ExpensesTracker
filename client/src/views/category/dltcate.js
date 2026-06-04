@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, IconButton } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 import TransferCate from './transfercate';
 import { SuccessDialog } from '../Dialog/success';
 
@@ -29,16 +30,13 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
     const [selectedCateId, setSelectedCateId] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
             return; 
         }
 
         setIsLoading(true);
-        api.get(`/trans/count/${CateId}`, {
-            headers: { accessToken: token }
-        })
+        api.get(`/trans/count/${CateId}`)
         .then((response) => {
             setCount(Number(response.data.countT)); 
         })
@@ -69,9 +67,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
         setOpenTransModal(false);
         setIsLoading(true);
         try {
-            await api.delete(`/cate/dlt/${CateId}`, {
-                headers: { accessToken: localStorage.getItem("accessToken") }
-            });
+            await api.delete(`/cate/dlt/${CateId}`);
             onCateDeleted(CateId); 
             onClose();
         } catch (error) {

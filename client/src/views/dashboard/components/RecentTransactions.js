@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import {
   Timeline,
@@ -33,11 +33,7 @@ function RecentTransactions() {
       navigation('/auth/login');
       return;
     }
-    api.get(`/trans/viewAll`, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        }
-      })
+    api.get(`/trans/viewAll`)
         .then((response) => {
           if (response.data) {
             setTrans(response.data.latestTrans);

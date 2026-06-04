@@ -19,7 +19,7 @@ const getAll = async (userId) => {
         include: [{ model: Categories, include: [{ model: Icons }] }],
     });
 
-    if (!budgets || budgets.length === 0) return null;
+    if (!budgets || budgets.length === 0) return { totalBudget: 0, totalAmount: 0, budgetTrans: [] };
 
     const categoryIds = budgets.map(b => b.CategoryId);
 

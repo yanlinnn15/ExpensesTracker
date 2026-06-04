@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, TextField, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -26,11 +26,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
         }
         
         setIsLoading(true);
-
-        const token = localStorage.getItem("accessToken");
-        api.get("/cate/viewAll", {
-            headers: { accessToken: token }
-        })
+        api.get("/cate/viewAll")
         .then((response) => {
             setIsLoading(false);
         })
@@ -52,9 +48,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {
-            api.patch(`/budget/edit/${Bid}`, data, {
-                headers: { accessToken: localStorage.getItem("accessToken") }
-            })
+            api.patch(`/budget/edit/${Bid}`, data)
             .then((response) => {        
                 if (response.data) {
                     const updatedBudget = response.data;

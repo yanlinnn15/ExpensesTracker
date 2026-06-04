@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack, Typography, Avatar, Box, Select, MenuItem, Card, CardContent } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../../../components/shared/DashboardCard';
@@ -34,9 +34,7 @@ const BalanceOverview = () => {
       navigate('/auth/login');
       return;
     }
-    api.get(`/trans/viewAll?mth=${selectedDate}`, {
-      headers: { accessToken: localStorage.getItem("accessToken") }
-    })
+    api.get(`/trans/viewAll?mth=${selectedDate}`)
     .then((response) => {
       if (response.data) {
         setTtlIncome(response.data.ttlIncome);

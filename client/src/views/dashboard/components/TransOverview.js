@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -45,9 +45,7 @@ const TransOverview = () => {
       navigate('/auth/login');
       return;
     }
-    api.get(`/trans/viewAll?mth=${selectedDate}`, {
-      headers: { accessToken: localStorage.getItem("accessToken") }
-    })
+    api.get(`/trans/viewAll?mth=${selectedDate}`)
     .then((response) => {
       const incomeData = response.data.monthly.filter(item => item.type === true);
       const expenseData = response.data.monthly.filter(item => item.type === false);

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';  
+import React, { useState, useEffect } from 'react';  
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -58,15 +58,9 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
         }
         
         setIsLoading(true);
-      
-        const token = localStorage.getItem("accessToken");
         Promise.all([
-            api.get("/cate/viewAll", {
-                headers: { accessToken: token }
-            }),
-            api.get(`/trans/view/${transactionId}`, {
-                headers: { accessToken: token }
-            })
+            api.get("/cate/viewAll"),
+            api.get(`/trans/view/${transactionId}`)
         ])
         .then(([categoryResponse, transactionResponse]) => {
             setCate(categoryResponse.data.cate);
@@ -99,9 +93,7 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data) => {    
-            api.patch(`/trans/edit/${transactionId}`, data, {
-                headers: { accessToken: localStorage.getItem("accessToken") }
-            })
+            api.patch(`/trans/edit/${transactionId}`, data)
             .then((response) => {        
                 const category = cate.find(c => c.id === data.CategoryId);
                 

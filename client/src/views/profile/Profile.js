@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Typography, TextField, Button, DialogContentText, Alert, Box, Grid, Paper, Snackbar, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import DashboardCard from '../../components/shared/DashboardCard';
@@ -33,8 +33,7 @@ const Profile = () => {
       return;
     }
 
-    api.get(`/auth/profile/${id}`,
-      {headers: {accessToken: localStorage.getItem("accessToken")}})
+    api.get(`/auth/profile/${id}`)
       .then((response) => {
         setFirstName(response.data.fName);
         setLastName(response.data.lName);
@@ -67,8 +66,7 @@ const Profile = () => {
     try {
       const response = await api.patch(
         `/auth/edit/${id}`,
-        { fname: firstName, lname: lastName },
-        { headers: { accessToken: localStorage.getItem("accessToken") } }
+        { fname: firstName, lname: lastName }
       );
   
       if (response.status === 200) {
@@ -132,8 +130,7 @@ const Profile = () => {
     }
 
     const data = { password: newPassword,confirmPassword: confirmPassword };
-    api.put(`/auth/pass/${id}`, data, 
-      { headers: { accessToken: localStorage.getItem("accessToken") } }
+    api.put(`/auth/pass/${id}`, data
     )
         .then((response) => {
             const { message } = response.data;

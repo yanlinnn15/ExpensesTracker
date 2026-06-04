@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
 import { useFormik, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -49,11 +49,7 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
         }
 
         setIsLoading(true);
-
-        const token = localStorage.getItem("accessToken");
-        api.get("/cate/viewAll", {
-            headers: { accessToken: token }
-        })
+        api.get("/cate/viewAll")
         .then((response) => {
             setCate(response.data.catebudget || []);
             setIsLoading(false);
@@ -78,9 +74,7 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
         },
         validationSchema: validationSchema,
         onSubmit: (data) => {
-            api.post('/budget/', data, {
-                headers: { accessToken: localStorage.getItem("accessToken") }
-            })
+            api.post('/budget/', data)
             .then((response) => {        
                 if (response.data) {
                     const updatedBudget = {

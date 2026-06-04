@@ -1,27 +1,27 @@
-const {verify} = require("jsonwebtoken");
-const {Users} = require("../models");
+const { verify } = require('jsonwebtoken');
+const { Users } = require('../models');
+const AppError = require('./AppError');
 
-const validateToken = async (req,res,next) => {
-    const accessToken = req.header("accessToken");
+const validateToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
 
-    if(!accessToken)
-        return res.status(401).json({ error: "User not logged in" });
-
-    try{
-        const token = verify(accessToken, process.env.JWT_SECRET);
-        const checkActive = await Users.findOne({where: {id:token.id}});
-
-        if(!checkActive)
-            return res.status(403).json({ message: 'Account is inactive' });
-
-        req.user = { ...token, isGuest: token.isGuest || false };
-        return next();
-        
-            
-    }catch(error){
-        console.error('Token validation error:', error);
-        return res.status(401).json({ error: "Invalid access token" });
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return next(new AppError(401, 'User not logged in'));
     }
-}
+
+    const token = authHeader.split(' ')[1];
+
+    try {
+        const decoded = verify(token, process.env.JWT_SECRET);
+        const user    = await Users.findOne({ where: { id: decoded.id } });
+
+        if (!user) return next(new AppError(403, 'Account is inactive'));
+
+        req.user = { ...decoded, isGuest: decoded.isGuest || false };
+        next();
+    } catch (error) {
+        next(new AppError(401, 'Invalid access token'));
+    }
+};
 
 module.exports = { validateToken };

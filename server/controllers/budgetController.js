@@ -25,7 +25,6 @@ const create = async (req, res, next) => {
 const getAll = async (req, res, next) => {
     try {
         const data = await budgetService.getAll(req.user.id);
-        if (!data) throw new AppError(404, 'Budgets Not Found for the current year');
         res.status(200).json(data);
     } catch (e) { next(e); }
 };

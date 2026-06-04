@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardActionArea, Grid, Modal, Box, Typography, Button, IconButton, Select, MenuItem } from '@mui/material';
 import { IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from 'src/helpers/authCheck';
 import * as TablerIcons from "@tabler/icons-react"; 
 
 const style = {
@@ -32,15 +33,12 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             navigate("/auth/login");
             return;
         }
 
-        api.get(`/cate/someCate/${CateId}`, {
-            headers: { accessToken: token }
-        })
+        api.get(`/cate/someCate/${CateId}`)
         .then(response => setCategories(response.data))
         .catch(error => console.error("Error fetching categories:", error));
     }, [navigate]);
@@ -48,8 +46,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
     const handleNextStep = async (newCategoryId) => {
         setLoading(true);
         setError('');
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
+        if (!isAuthenticated()) {
             setError('User is not authenticated');
             setLoading(false);
             return;
@@ -60,8 +57,6 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
                 console.log(transId)
                 return api.patch(`/trans/edit/${transId}`, {
                     CategoryId: newCategoryId,
-                }, {
-                    headers: { accessToken: token }
                 });
             });
 
