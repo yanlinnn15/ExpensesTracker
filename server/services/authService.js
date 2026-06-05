@@ -1,9 +1,11 @@
-const { Users, Categories } = require('../models');
+const { Users, Categories, sequelize } = require('../models');
 const { sign } = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { Op } = require('sequelize');
 const { sendVerificationEmail, sendForgotEmail } = require('./emailService');
+
+const DUMMY_HASH = bcrypt.hashSync('dummy-timing-normalization', 10);
 
 const DEFAULT_CATEGORIES = [
     { name: 'Salary',     is_income: 1, IconId: 1 },
@@ -14,8 +16,11 @@ const DEFAULT_CATEGORIES = [
     { name: 'Shopping',   is_income: 0, IconId: 7 },
 ];
 
-const seedDefaultCategories = async (userId) => {
-    await Categories.bulkCreate(DEFAULT_CATEGORIES.map(c => ({ ...c, UserId: userId })));
+const seedDefaultCategories = async (userId, t) => {
+    await Categories.bulkCreate(
+        DEFAULT_CATEGORIES.map(c => ({ ...c, UserId: userId })),
+        t ? { transaction: t } : {}
+    );
 };
 
 const register = async ({ fname, lname, email, password }) => {
@@ -23,11 +28,14 @@ const register = async ({ fname, lname, email, password }) => {
     if (exists) return { conflict: true };
 
     const hash = await bcrypt.hash(password, 10);
-    const user = await Users.create({
-        fName: fname, lName: lname, email,
-        password: hash, active: true, verify: true,
+    const user = await sequelize.transaction(async (t) => {
+        const newUser = await Users.create({
+            fName: fname, lName: lname, email,
+            password: hash, active: true, verify: true,
+        }, { transaction: t });
+        await seedDefaultCategories(newUser.id, t);
+        return newUser;
     });
-    await seedDefaultCategories(user.id);
     return { user };
 };
 
@@ -106,7 +114,7 @@ const createGuest = async () => {
         active: true, verify: true, isGuest: true,
     });
     await seedDefaultCategories(user.id);
-    const token = sign({ fname: 'Guest', id: user.id, isGuest: true }, process.env.JWT_SECRET);
+    const token = sign({ fname: 'Guest', id: user.id, isGuest: true }, process.env.JWT_SECRET, { expiresIn: '7d' });
     return { token, fname: 'Guest', id: user.id, isGuest: true };
 };
 
@@ -116,13 +124,16 @@ const deleteGuest = async (userId) => {
 
 const login = async (email, password) => {
     const user = await Users.findOne({ where: { email } });
-    if (!user)        return { invalid: true };
+    if (!user) {
+        await bcrypt.compare(password, DUMMY_HASH);
+        return { invalid: true };
+    }
     if (!user.active) return { inactive: true };
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return { invalid: true };
 
-    const token = sign({ fname: user.fName, id: user.id }, process.env.JWT_SECRET);
+    const token = sign({ fname: user.fName, id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     return { token, fname: user.fName, id: user.id };
 };
 

@@ -77,8 +77,6 @@ function AddExpenses({ open, onClose, getExpenses }) {
 
   const onSubmit = (data) => {    
     api.post("/trans/", data).then((response) => {
-        console.log("Server response:", response.data);
-        
         if (response.data && response.data.trans) {
             const category = cate.find(c => c.id === data.CategoryId);
             

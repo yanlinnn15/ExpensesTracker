@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, IconButton, Menu, MenuItem, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Box } from '@mui/material';
+import { Typography, IconButton, Menu, MenuItem, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Box, CircularProgress } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import { Container, Stack,  
           Card,
@@ -37,6 +37,7 @@ const Categories = () => {
     const [openDeleteDialog, setDeleteDialogOpen] = useState(false);
     const [selectedType, setSelectedType] = useState("")
     const [errorMsg, setErrorMsg] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     let navigator = useNavigate();
 
     useEffect(() => {
@@ -53,7 +54,8 @@ const Categories = () => {
           })
           .catch((error) => {
             setErrorMsg(error.message);
-          });
+          })
+          .finally(() => setIsLoading(false));
       }, []);
 
       const handleCateAdded = (newCate) => {
@@ -120,6 +122,7 @@ const Categories = () => {
       >
         <DashboardCard title="Categories" sx={{ backgroundColor: 'transparent' }}>
           <Container>
+            {isLoading && <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>}
             <Stack direction="row" justifyContent="flex-end" mb={4}>
               <Button
                 variant="contained"

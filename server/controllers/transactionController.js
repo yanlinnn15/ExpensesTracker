@@ -39,7 +39,7 @@ const getYearlySummary = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
     try {
-        const transaction = await transactionService.getById(req.params.id);
+        const transaction = await transactionService.getById(req.params.id, req.user.id);
         if (!transaction) throw new AppError(404, 'Transaction Not Found');
         res.status(200).json(transaction);
     } catch (e) { next(e); }
@@ -54,7 +54,7 @@ const countByCategory = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const deleted = await transactionService.remove(req.params.id);
+        const deleted = await transactionService.remove(req.params.id, req.user.id);
         if (!deleted) throw new AppError(404, 'Transaction Not Found');
         res.status(200).json({ message: 'Transaction deleted successfully' });
     } catch (e) { next(e); }
@@ -62,7 +62,7 @@ const remove = async (req, res, next) => {
 
 const removeByCategory = async (req, res, next) => {
     try {
-        await transactionService.removeByCategory(req.params.id);
+        await transactionService.removeByCategory(req.params.id, req.user.id);
         res.status(200).json({ message: 'Transaction deleted successfully' });
     } catch (e) { next(e); }
 };
@@ -71,7 +71,7 @@ const update = async (req, res, next) => {
     try {
         const { date, amount, remark, CategoryId } = req.body;
         validate(ESchema, { date, amount, remark, CategoryId });
-        const result = await transactionService.update(req.params.id, { date, amount, remark, CategoryId });
+        const result = await transactionService.update(req.params.id, req.user.id, { date, amount, remark, CategoryId });
         if (!result)                 throw new AppError(404, 'Transaction Not Found');
         if (result.categoryNotFound) throw new AppError(404, 'Category Not Found');
         res.status(200).json({ message: 'Transaction updated successfully', transaction: result });

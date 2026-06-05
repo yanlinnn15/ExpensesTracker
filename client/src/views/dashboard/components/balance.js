@@ -6,6 +6,7 @@ import getLast12Months from '../../func/func12m';
 import api from 'src/api';
 import * as TablerIcons from "@tabler/icons-react";
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { showsweetAlert } from '../../../helpers/alert';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -41,7 +42,7 @@ const BalanceOverview = () => {
         setTtlExpense(response.data.ttlExpense);
         setTtlBalance(parseFloat(response.data.ttlIncome - response.data.ttlExpense).toFixed(2));
       } else {
-        alert('Unexpected response format. Please try again.');
+        showsweetAlert('Error', 'Unexpected response format. Please try again.', 'error');
       }
     })
     .catch((error) => {

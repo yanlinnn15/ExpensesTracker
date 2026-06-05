@@ -5,8 +5,8 @@ const create = async (userId, { name, IconId, is_income }) => {
     return await Categories.create({ name, IconId, is_income, UserId: userId });
 };
 
-const update = async (id, { name, IconId, is_income }) => {
-    const category = await Categories.findByPk(id);
+const update = async (id, userId, { name, IconId, is_income }) => {
+    const category = await Categories.findOne({ where: { id, UserId: userId } });
     if (!category) return null;
     if (name      !== undefined) category.name      = name;
     if (IconId    !== undefined) category.IconId    = IconId;
@@ -49,8 +49,8 @@ const getOthersByType = async (id, userId) => {
     });
 };
 
-const remove = async (id) => {
-    const category = await Categories.findByPk(id);
+const remove = async (id, userId) => {
+    const category = await Categories.findOne({ where: { id, UserId: userId } });
     if (!category) return false;
     await Transactions.destroy({ where: { CategoryId: id } });
     await Budgets.destroy({ where: { CategoryId: id } });

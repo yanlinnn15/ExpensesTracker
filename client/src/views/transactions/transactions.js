@@ -30,6 +30,7 @@ import AddTransactionModal from './addtrans';
 import EditTrans from './edittrans';
 import DeleteTrans from './dlttrans';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { showsweetAlert } from 'src/helpers/alert';
 
 const renderIcon = (iconName) => {
     const IconComponent = TablerIcons[iconName]; 
@@ -57,10 +58,6 @@ const Transactions = () => {
     const handleTransOpen = () => setTransOpen(true);
     const handleTransClose = () => setTransOpen(false);
     const location = useLocation(); 
-
-    const useQuery = () => {
-        return new URLSearchParams(location.search);
-    };
 
     const handleMenuOpen = (event, tran) => {
         setSelectedTransaction(tran); 
@@ -161,8 +158,7 @@ const Transactions = () => {
     };
 
     useEffect(() => {
-        const query = useQuery(); 
-        const mth = query.get('mth'); 
+        const mth = new URLSearchParams(location.search).get('mth');
 
         if(mth)
             setSelectedDate(mth);
@@ -191,7 +187,7 @@ const Transactions = () => {
                 setTtlIncome(response.data.ttlIncome);
                 setTtlExpense(response.data.ttlExpense);
             } else {
-                alert('Unexpected response format. Please try again.');
+                showsweetAlert('Error', 'Unexpected response format. Please try again.', 'error');
             }
         }).catch((error) => {
             if (error.response) {

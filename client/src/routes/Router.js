@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import Loadable from '../layouts/full/shared/loadable/Loadable';
 import ForgorPassLink from '../views/authentication/forgotpasslink';
+import ProtectedRoute from '../helpers/ProtectedRoute';
 
 /* ***Layouts**** */
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -35,17 +36,17 @@ const Router = [
     element: <FullLayout />,
     children: [
       { path: '/', element: <Navigate to="/dashboard" /> },
-      { path: '/dashboard', exact: true, element: <Dashboard /> },
-      { path: '/transactions', exact: true, element: <Transaction /> },
-      { path: '/addtrans', exact: true, element: <AddTrans /> },
-      { path: '/addexpenses', exact: true, element: <AddExpenses /> },
-      { path: '/balances', exact: true, element: <Balances /> },
-      { path: '/profile/:id', exact: true, element: <Profiles /> },
-      { path: '/budgets', exact: true, element: <Budgets /> },
-      { path: '/category', exact: true, element: <Categories /> },
-      { path: '/icons', exact: true, element: <Icons /> },
-      { path: '/ui/typography', exact: true, element: <TypographyPage /> },
-      { path: '/ui/shadow', exact: true, element: <Shadow /> },
+      { path: '/dashboard', exact: true, element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
+      { path: '/transactions', exact: true, element: <ProtectedRoute><Transaction /></ProtectedRoute> },
+      { path: '/addtrans', exact: true, element: <ProtectedRoute><AddTrans /></ProtectedRoute> },
+      { path: '/addexpenses', exact: true, element: <ProtectedRoute><AddExpenses /></ProtectedRoute> },
+      { path: '/balances', exact: true, element: <ProtectedRoute><Balances /></ProtectedRoute> },
+      { path: '/profile/:id', exact: true, element: <ProtectedRoute><Profiles /></ProtectedRoute> },
+      { path: '/budgets', exact: true, element: <ProtectedRoute><Budgets /></ProtectedRoute> },
+      { path: '/category', exact: true, element: <ProtectedRoute><Categories /></ProtectedRoute> },
+      { path: '/icons', exact: true, element: <ProtectedRoute><Icons /></ProtectedRoute> },
+      { path: '/ui/typography', exact: true, element: <ProtectedRoute><TypographyPage /></ProtectedRoute> },
+      { path: '/ui/shadow', exact: true, element: <ProtectedRoute><Shadow /></ProtectedRoute> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },

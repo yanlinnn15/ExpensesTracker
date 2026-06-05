@@ -191,7 +191,7 @@ const Balances = () => {
                                     color: 'primary.main',
                                   },
                                 }}
-                                onClick={() => console.log('Filter clicked')}
+                                onClick={() => {}}
                               >
                                 <IconChevronRight />
                               </Button>

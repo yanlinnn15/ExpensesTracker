@@ -1,32 +1,40 @@
 const { Transactions, Categories, Icons } = require('../models');
 const { Op, fn, col } = require('sequelize');
+const AppError = require('../middlewares/AppError');
 
 const create = async (userId, { date, amount, remark, CategoryId, type }) => {
     return await Transactions.create({ date, amount, remark, CategoryId, type, UserId: userId });
 };
 
 const getMonthly = async (userId, mth) => {
-    const startDate = new Date(`${mth}-01`);
-    const endDate   = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 1);
-    endDate.setDate(0);
-
-    const dateRange = { [Op.between]: [startDate, endDate] };
-    const whereClause = { UserId: userId, date: dateRange };
-
     const withCatIcon = { model: Categories, include: [{ model: Icons }] };
-
-    const transaction = await Transactions.findAll({
-        where: whereClause,
-        include: [withCatIcon],
-        order: [['date', 'DESC']],
-    });
 
     const latestTrans = await Transactions.findAll({
         where: { UserId: userId },
         include: [withCatIcon],
         order: [['updatedAt', 'DESC']],
         limit: 5,
+    });
+
+    // mth is optional — if not provided, return only latestTrans
+    if (!mth) {
+        return { transaction: [], latestTrans, monthly: [], ttlIncome: '0.00', ttlExpense: '0.00' };
+    }
+
+    if (!/^\d{4}-\d{2}$/.test(mth)) throw new AppError(400, 'Invalid month format. Expected YYYY-MM');
+
+    const startDate = new Date(`${mth}-01`);
+    const endDate   = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0);
+
+    const dateRange   = { [Op.between]: [startDate, endDate] };
+    const whereClause = { UserId: userId, date: dateRange };
+
+    const transaction = await Transactions.findAll({
+        where: whereClause,
+        include: [withCatIcon],
+        order: [['date', 'DESC']],
     });
 
     const monthly = await Transactions.findAll({
@@ -47,7 +55,7 @@ const getMonthly = async (userId, mth) => {
 
     return {
         transaction: transaction || [],
-        latestTrans:  latestTrans  || [],
+        latestTrans,
         monthly:      monthly      || [],
         ttlIncome:  (ttlIncome  != null) ? ttlIncome.toFixed(2)  : '0.00',
         ttlExpense: (ttlExpense != null) ? ttlExpense.toFixed(2) : '0.00',
@@ -88,9 +96,9 @@ const getYearlySummary = async (userId) => {
     };
 };
 
-const getById = async (id) => {
+const getById = async (id, userId) => {
     return await Transactions.findAll({
-        where: { id },
+        where: { id, UserId: userId },
         include: [{ model: Categories, include: [{ model: Icons }] }],
     });
 };
@@ -102,19 +110,19 @@ const countByCategory = async (userId, categoryId) => {
     });
 };
 
-const remove = async (id) => {
-    const transaction = await Transactions.findByPk(id);
+const remove = async (id, userId) => {
+    const transaction = await Transactions.findOne({ where: { id, UserId: userId } });
     if (!transaction) return false;
     await transaction.destroy();
     return true;
 };
 
-const removeByCategory = async (categoryId) => {
-    await Transactions.destroy({ where: { CategoryId: categoryId } });
+const removeByCategory = async (categoryId, userId) => {
+    await Transactions.destroy({ where: { CategoryId: categoryId, UserId: userId } });
 };
 
-const update = async (id, { date, amount, remark, CategoryId }) => {
-    const transaction = await Transactions.findByPk(id);
+const update = async (id, userId, { date, amount, remark, CategoryId }) => {
+    const transaction = await Transactions.findOne({ where: { id, UserId: userId } });
     if (!transaction) return null;
 
     if (date       !== undefined) transaction.date       = date;

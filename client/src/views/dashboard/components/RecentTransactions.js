@@ -10,9 +10,10 @@ import {
   TimelineContent,
   timelineOppositeContentClasses,
 } from '@mui/lab';
-import { Typography } from '@mui/material';
+import { Typography, CircularProgress } from '@mui/material';
 import * as TablerIcons from "@tabler/icons-react"; 
 import api from 'src/api';
+import { showsweetAlert } from '../../../helpers/alert';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
@@ -26,6 +27,7 @@ function RecentTransactions() {
 
   const [trans, setTrans] = useState([]);
   const [msgError, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   let navigation = useNavigate();
 
   useEffect(() => {
@@ -38,7 +40,7 @@ function RecentTransactions() {
           if (response.data) {
             setTrans(response.data.latestTrans);
           } else {
-            alert('Unexpected response format. Please try again.');
+            showsweetAlert('Error', 'Unexpected response format. Please try again.', 'error');
           }
         }).catch((error) => {
           if (error.response) {
@@ -46,7 +48,7 @@ function RecentTransactions() {
           } else {
             setErrorMsg("Server Error");
           }
-        });
+        }).finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -60,6 +62,7 @@ function RecentTransactions() {
       }}
     >
       <Box>
+        {isLoading && <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>}
         <Timeline
           className="theme-timeline"
           sx={{

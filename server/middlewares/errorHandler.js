@@ -1,11 +1,13 @@
+const logger = require('../utils/logger');
+
 const errorHandler = (err, req, res, next) => {
     const status  = err.status || err.statusCode || 500;
     const message = err.message || 'Server Error';
 
-    if (process.env.NODE_ENV === 'production') {
-        console.error(`[${new Date().toISOString()}] ${req.method} ${req.url} → ${status}: ${message}`);
+    if (status >= 500) {
+        logger.error(`${req.method} ${req.url} → ${status}: ${message}`, { stack: err.stack });
     } else {
-        console.error(err.stack || err);
+        logger.warn(`${req.method} ${req.url} → ${status}: ${message}`);
     }
 
     res.status(status).json({

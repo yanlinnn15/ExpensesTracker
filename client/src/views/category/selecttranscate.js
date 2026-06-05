@@ -52,9 +52,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
             return;
         }
         try {
-            console.log(selectedTransactions)
             const migrationPromises =selectedTransactions.map((transId) => {
-                console.log(transId)
                 return api.patch(`/trans/edit/${transId}`, {
                     CategoryId: newCategoryId,
                 });

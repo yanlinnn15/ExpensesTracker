@@ -9,7 +9,8 @@ import {
   TextField,
   Button,
   Box,
-  useTheme
+  useTheme,
+  CircularProgress
 } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import { Container, Grid, Stack, Avatar, Card, CardContent, CardHeader } from '@mui/material';
@@ -36,6 +37,7 @@ function Budgets() {
   const [openDeleteDialog, setDeleteDialogOpen] = useState(false);
   const [selectedBudgetId, setSelectedBudgetId] = useState(null);
   const [selectedBudget, setSelectedBudget] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigator = useNavigate();
 
@@ -47,8 +49,6 @@ function Budgets() {
     api.get("/budget/viewAll")
     .then((response) => {
       if (response.data) {
-        console.log(response.data.totalAmount)
-
         setTtlBudget(
           isNaN(parseFloat(response.data.totalBudget)) ? 0 : parseFloat(response.data.totalBudget).toFixed(2)
         );
@@ -60,7 +60,8 @@ function Budgets() {
     })
     .catch((error) => {
       setErrorMsg(error.message);
-    });
+    })
+    .finally(() => setIsLoading(false));
   }, []);
 
   const handleBudgetAdded = (newCate) => {
@@ -133,8 +134,10 @@ function Budgets() {
             </Button>
           </Stack>
 
+          {isLoading && <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>}
+
           <Grid container spacing={3} mb={4}>
-            {[ 
+            {[
               { title: "Total Budget", amount: ttlBudget, color: primary, bgcolor: primarylight },
               { title: "Total Spent", amount: ttlAmount, color: theme.palette.error.main, bgcolor: "rgb(255, 231, 217)" },
               { title: "Remaining Budget", amount: (ttlBudget - ttlAmount).toFixed(2), color: "rgb(0, 194, 146)", bgcolor: successlight }

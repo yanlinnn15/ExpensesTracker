@@ -31,7 +31,7 @@ const getAll = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const deleted = await budgetService.remove(req.params.id);
+        const deleted = await budgetService.remove(req.params.id, req.user.id);
         if (!deleted) throw new AppError(404, 'Budget Not Found');
         res.status(200).json({ message: 'Success' });
     } catch (e) { next(e); }
@@ -41,7 +41,7 @@ const update = async (req, res, next) => {
     try {
         const { amount, remark } = req.body;
         validate(BSchema, { amount, remark });
-        const budget = await budgetService.update(req.params.id, { amount, remark });
+        const budget = await budgetService.update(req.params.id, req.user.id, { amount, remark });
         if (!budget) throw new AppError(404, 'Budget Not Found');
         res.status(200).json({ message: 'Budget updated successfully', budget });
     } catch (e) { next(e); }

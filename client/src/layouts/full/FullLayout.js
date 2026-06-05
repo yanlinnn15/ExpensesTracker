@@ -21,13 +21,9 @@ const PageWrapper = styled('div')(() => ({
   backgroundColor: 'transparent',
 }));
 
-const addExpense = () => {
-  console.log("Expense added");
-};
+const addExpense = () => {};
 
-const addIncome = () => {
-  console.log("Income added");
-};
+const addIncome = () => {};
 
 const FullLayout = () => {
 

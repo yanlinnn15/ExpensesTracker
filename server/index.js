@@ -1,12 +1,35 @@
 require('dotenv').config();
 
+const logger = require('./utils/logger');
+const requestLogger = require('./middlewares/requestLogger');
+
+['JWT_SECRET', 'CLIENT_URL', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'].forEach(k => {
+    if (!process.env[k]) {
+        logger.error(`Missing required env var: ${k}`);
+        process.exit(1);
+    }
+});
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const { Op } = require('sequelize');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
+app.use(helmet());
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL }));
+app.use(requestLogger);
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { message: 'Too many attempts, please try again later.' },
+});
+app.use('/auth/login',    authLimiter);
+app.use('/auth/register', authLimiter);
+app.use('/auth/guest',    authLimiter);
 
 const db = require('./models');
 
@@ -30,16 +53,20 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 
-db.sequelize.sync({ alter: true }).then(async () => {
+const syncOptions = process.env.NODE_ENV === 'production' ? {} : { alter: true };
+db.sequelize.sync(syncOptions).then(async () => {
     // Delete abandoned guest accounts older than 24 hours
     const { Users } = db;
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const deleted = await Users.destroy({
         where: { isGuest: true, createdAt: { [Op.lt]: cutoff } }
     });
-    if (deleted > 0) console.log(`Cleaned up ${deleted} expired guest account(s)`);
+    if (deleted > 0) logger.info(`Cleaned up ${deleted} expired guest account(s)`);
 
     app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT} [${process.env.NODE_ENV}]`);
+        logger.info(`Server running on port ${PORT} [${process.env.NODE_ENV}]`);
     });
+}).catch(err => {
+    logger.error('DB connection failed', { error: err.message, stack: err.stack });
+    process.exit(1);
 });

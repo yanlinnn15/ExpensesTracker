@@ -25,7 +25,7 @@ const update = async (req, res, next) => {
     try {
         const { name, IconId, is_income } = req.body;
         validate(CategoriesSchema, { name, IconId, is_income });
-        const category = await categoryService.update(req.params.id, { name, IconId, is_income });
+        const category = await categoryService.update(req.params.id, req.user.id, { name, IconId, is_income });
         if (!category) throw new AppError(404, 'Category Not Found');
         res.status(200).json({ message: 'Category updated successfully', category });
     } catch (e) { next(e); }
@@ -57,7 +57,7 @@ const getOthersByType = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const deleted = await categoryService.remove(req.params.id);
+        const deleted = await categoryService.remove(req.params.id, req.user.id);
         if (!deleted) throw new AppError(404, 'Category not found');
         res.status(200).json({ message: 'Category deleted successfully' });
     } catch (e) { next(e); }

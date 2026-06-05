@@ -54,15 +54,15 @@ const getAll = async (userId) => {
     return { totalBudget, totalAmount, budgetTrans };
 };
 
-const remove = async (id) => {
-    const budget = await Budgets.findByPk(id);
+const remove = async (id, userId) => {
+    const budget = await Budgets.findOne({ where: { id, UserId: userId } });
     if (!budget) return false;
     await budget.destroy();
     return true;
 };
 
-const update = async (id, { amount, remark }) => {
-    const budget = await Budgets.findByPk(id);
+const update = async (id, userId, { amount, remark }) => {
+    const budget = await Budgets.findOne({ where: { id, UserId: userId } });
     if (!budget) return null;
     if (amount !== undefined) budget.amount = amount;
     if (remark !== undefined) budget.remark = remark;
