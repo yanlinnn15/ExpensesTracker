@@ -3,7 +3,12 @@ require('dotenv').config();
 const logger = require('./utils/logger');
 const requestLogger = require('./middlewares/requestLogger');
 
-['JWT_SECRET', 'CLIENT_URL', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'].forEach(k => {
+const isProd = process.env.NODE_ENV === 'production';
+const requiredVars = isProd
+    ? ['JWT_SECRET', 'CLIENT_URL', 'DB_URL', 'DB_DIALECT']
+    : ['JWT_SECRET', 'CLIENT_URL', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD'];
+
+requiredVars.forEach(k => {
     if (!process.env[k]) {
         logger.error(`Missing required env var: ${k}`);
         process.exit(1);
