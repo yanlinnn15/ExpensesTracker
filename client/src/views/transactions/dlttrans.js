@@ -4,19 +4,7 @@ import { IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
-
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
-};
+import { modalStyle as style } from 'src/helpers/modalStyle';
 
 function DeleteTrans({ open, onClose, onTransactionDeleted, transactionId }) {
     const navigate = useNavigate();

@@ -4,18 +4,7 @@ import AddExpenses from './addexpense'; // Assuming this is your expenses modal 
 import AddIncome from './addincome'; // Assuming you have a similar component for income
 import { getIn } from 'formik';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-  borderRadius: 2,
-};
+import { modalStyle as style } from 'src/helpers/modalStyle';
 
 function AddTransactionModal({ open, onClose, getExpense, getIncome}) {
   const [transactionType, setTransactionType] = useState(null);

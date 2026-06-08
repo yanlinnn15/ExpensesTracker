@@ -4,21 +4,10 @@ import { IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
-import * as TablerIcons from "@tabler/icons-react"; 
+import * as TablerIcons from "@tabler/icons-react";
+import { modalStyle } from 'src/helpers/modalStyle';
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '80%',
-    maxWidth: '600px',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
-};
+const style = { ...modalStyle, width: '80%', maxWidth: '600px' };
 
 const renderIcon = (iconName) => {
     const IconComponent = TablerIcons[iconName]; 

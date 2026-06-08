@@ -6,6 +6,7 @@ import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { modalStyle as style } from 'src/helpers/modalStyle';
 
 const validationSchema = Yup.object({
     amount: Yup.number()
@@ -67,7 +68,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4, borderRadius: 2 }}>
+            <Box sx={style}>
                 <Typography variant="h6" component="h2" gutterBottom>
                     Edit Budget
                 </Typography>

@@ -16,13 +16,17 @@ import {
   Stack,
   Box,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import DashboardCard from '../../components/shared/DashboardCard';
-import { IconCoin, IconFilter, IconChevronRight } from "@tabler/icons-react";
+import { IconCoin, IconChevronRight } from "@tabler/icons-react";
 import { useNavigate, Link } from 'react-router-dom';
 import api from 'src/api';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { INCOME_COLOR, EXPENSE_COLOR } from 'src/helpers/transactionColors';
+
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const Balances = () => {
   const [errormsg, setErrorMsg] = useState(null);
@@ -32,6 +36,7 @@ const Balances = () => {
   const [listI, setListI] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [ttlIncome, setTtlIncome] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
@@ -60,14 +65,14 @@ const Balances = () => {
         response.data.monthlyI.forEach(({ year, month, totalAmount }) => {
           if (year === currentYear && month <= currentMonth) {
             const parsedAmount = parseFloat(totalAmount);
-            monthlyData[month - 1].income = !isNaN(parsedAmount) ? parsedAmount.toFixed(2) : '0.00'; 
+            monthlyData[month - 1].income = !isNaN(parsedAmount) ? parsedAmount.toFixed(2) : '0.00';
           }
         });
 
         response.data.monthlyE.forEach(({ year, month, totalAmount }) => {
           if (year === currentYear && month <= currentMonth) {
             const parsedAmount = parseFloat(totalAmount);
-            monthlyData[month - 1].expense = !isNaN(parsedAmount) ? parsedAmount.toFixed(2) : '0.00'; 
+            monthlyData[month - 1].expense = !isNaN(parsedAmount) ? parsedAmount.toFixed(2) : '0.00';
           }
         });
 
@@ -79,7 +84,8 @@ const Balances = () => {
       })
       .catch((error) => {
         setErrorMsg(error.message);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }, [navigate, currentMonth, currentYear]);
 
 
@@ -87,12 +93,13 @@ const Balances = () => {
     <PageContainer title="Balances" description="Balance Page">
       <DashboardCard title="Balances">
         {errormsg && <Alert severity="warning" sx={{ mb: 2 }}>{errormsg}</Alert>}
-        <Container maxWidth="lg">
+        {isLoading && <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>}
+        <Container maxWidth="lg" disableGutters>
           <Grid container spacing={3} justifyContent="center">
             <Grid item xs={12}>
               <Card variant="outlined">
                 <CardContent>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between">
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Avatar
                         variant="rounded"
@@ -108,26 +115,18 @@ const Balances = () => {
                         {currentYear} Surplus
                       </Typography>
                     </Stack>
-                    
-                  </Box>
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                      RM {surplus}
+                    </Typography>
+                  </Stack>
 
-                  <Typography variant="h5" sx={{ marginTop: 2 }}>
-                    RM {surplus}
-                  </Typography>
-
-                  <Stack direction="row" mt={1}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Typography variant="subtitle2" color="textPrimary" align="left">
-                          Income : RM {ttlIncome}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="subtitle2" color="textPrimary" align="left">
-                          Expenses: RM {ttlExpense}
-                        </Typography>
-                      </Grid>
-                    </Grid>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} mt={2} spacing={1}>
+                    <Typography variant="subtitle2" color="textPrimary">
+                      Income: RM {ttlIncome}
+                    </Typography>
+                    <Typography variant="subtitle2" color="textPrimary">
+                      Expenses: RM {ttlExpense}
+                    </Typography>
                   </Stack>
                 </CardContent>
               </Card>
@@ -135,54 +134,56 @@ const Balances = () => {
           </Grid>
         </Container>
         <Box mt={2} />
-        <Container fluid>
-          <Card variant="outlined">
-            <TableContainer>
-              <Table aria-label="simple table">
+        <Container maxWidth={false} disableGutters>
+          <Card variant="outlined" sx={{ overflow: 'hidden' }}>
+            <TableContainer sx={{ overflowX: 'auto' }}>
+              <Table aria-label="simple table" size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: '10%' }}>
-                      <Typography variant="subtitle1" color="textSecondary">Month</Typography>
+                    <TableCell sx={{ px: 1 }}>
+                      <Typography variant="subtitle2" color="textSecondary">Month</Typography>
                     </TableCell>
-                    <TableCell align="right" sx={{ width: '25%' }}>
-                      <Typography variant="subtitle1" color="textSecondary">Income</Typography>
+                    <TableCell align="right" sx={{ px: 1 }}>
+                      <Typography variant="subtitle2" color="textSecondary">Income</Typography>
                     </TableCell>
-                    <TableCell align="right"  sx={{ width: '25%' }}>
-                      <Typography variant="subtitle1" color="textSecondary">Expense</Typography>
+                    <TableCell align="right" sx={{ px: 1 }}>
+                      <Typography variant="subtitle2" color="textSecondary">Expense</Typography>
                     </TableCell>
-                    <TableCell align="right"  sx={{ width: '25%' }}>
-                      <Typography variant="subtitle1" color="textSecondary">Balance</Typography>
+                    <TableCell align="right" sx={{ px: 1 }}>
+                      <Typography variant="subtitle2" color="textSecondary">Balance</Typography>
                     </TableCell>
-                    <TableCell  sx={{ width: '15%' }}></TableCell>
+                    <TableCell sx={{ px: 1 }} />
                   </TableRow>
                 </TableHead>
                   <TableBody>
-                    {monthlyData.map((row) => (
-                      <TableRow key={row.month}>
-                        <TableCell>
-                          <Typography variant="subtitle1" color="textPrimary">
-                            {row.month}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right"> 
-                          <Typography variant="subtitle1" color="textPrimary">
-                            {row.income}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right"> 
-                          <Typography variant="subtitle1" color="textPrimary">
-                            {row.expense}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right"> 
-                          <Typography variant="subtitle1" color="textPrimary">
-                            {row.balance}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right">
-                        <Link 
-                          to={`/transactions?mth=${currentYear}-${row.month}`} >
-                            <Button
+                    {monthlyData.map((row) => {
+                      const balanceNum = parseFloat(row.balance);
+                      const balanceColor = balanceNum >= 0 ? INCOME_COLOR : EXPENSE_COLOR;
+                      return (
+                        <TableRow key={row.month}>
+                          <TableCell sx={{ px: 1 }}>
+                            <Typography variant="subtitle2" color="textPrimary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, whiteSpace: 'nowrap' }}>
+                              {MONTH_NAMES[parseInt(row.month, 10) - 1]}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right" sx={{ px: 1 }}>
+                            <Typography variant="subtitle2" color="textPrimary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                              {row.income}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right" sx={{ px: 1 }}>
+                            <Typography variant="subtitle2" color="textPrimary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                              {row.expense}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right" sx={{ px: 1 }}>
+                            <Typography variant="subtitle2" color={balanceColor} sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: 600 }}>
+                              {row.balance}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right" sx={{ px: 1 }}>
+                            <Link to={`/transactions?mth=${currentYear}-${row.month}`}>
+                              <Button
                                 sx={{
                                   minWidth: 0,
                                   padding: 0,
@@ -191,14 +192,14 @@ const Balances = () => {
                                     color: 'primary.main',
                                   },
                                 }}
-                                onClick={() => {}}
                               >
                                 <IconChevronRight />
                               </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
               </Table>
             </TableContainer>

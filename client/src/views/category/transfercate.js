@@ -7,21 +7,8 @@ import { isAuthenticated } from 'src/helpers/authCheck';
 import * as TablerIcons from "@tabler/icons-react"; 
 import SelectTransCate from './selecttranscate';
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '90%', 
-    maxWidth: 600, 
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
-    overflowY: 'auto', 
-    maxHeight: '80vh', 
-};
+import { modalStyle } from 'src/helpers/modalStyle';
+const style = { ...modalStyle, width: '90%', maxWidth: 600, overflowY: 'auto', maxHeight: '80vh' };
 
 function TransferCate({ open, onClose, CateId, onProcessing }) {
     const navigate = useNavigate();

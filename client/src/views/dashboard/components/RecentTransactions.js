@@ -17,6 +17,7 @@ import { showsweetAlert } from '../../../helpers/alert';
 import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { INCOME_COLOR, EXPENSE_COLOR } from 'src/helpers/transactionColors';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName]; 
@@ -110,8 +111,8 @@ function RecentTransactions() {
                   {renderIcon(transaction.Category.Icon.icon_class)}
                   {transaction.remark ? transaction.remark : transaction.Category.name}
                 </TimelineContent>
-                <TimelineContent style={{ textAlign: 'right', fontSize: '0.8rem' }}>
-                  {transaction.type === true ? "+" : "-"} RM {transaction.amount}
+                <TimelineContent style={{ textAlign: 'right', fontSize: '0.8rem', whiteSpace: 'nowrap', color: transaction.type === true ? INCOME_COLOR : EXPENSE_COLOR }}>
+                  {transaction.type === true ? "+" : "-"}RM {transaction.amount}
                 </TimelineContent>
               </TimelineItem>
             ))

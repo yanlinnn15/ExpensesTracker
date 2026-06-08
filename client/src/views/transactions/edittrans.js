@@ -7,25 +7,11 @@ import * as TablerIcons from "@tabler/icons-react";
 import api from 'src/api';  
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { modalStyle as style } from 'src/helpers/modalStyle';
 
-// Function to render icons dynamically
 const renderIcon = (iconName) => {
-    const IconComponent = TablerIcons[iconName]; 
+    const IconComponent = TablerIcons[iconName];
     return IconComponent ? <IconComponent /> : <TablerIcons.IconHelp />;
-};
-
-// Style for the modal
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
 };
 
 const today = (() => {
@@ -56,7 +42,8 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
             navigate("/auth/login");
             return;
         }
-        
+        if (!transactionId) return;
+
         setIsLoading(true);
         Promise.all([
             api.get("/cate/viewAll"),

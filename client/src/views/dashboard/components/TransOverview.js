@@ -10,7 +10,8 @@ import {
   Select,
   MenuItem,
   Tab,
-  Tabs
+  Tabs,
+  CircularProgress
 } from "@mui/material";
 import DashboardCard from '../../../components/shared/DashboardCard';
 import { IconGridDots } from "@tabler/icons-react";
@@ -36,6 +37,7 @@ const TransOverview = () => {
   const [expense, setExpense] = useState([]);
   const [income, setIncome] = useState([]);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDateMenuClose = (month) => setSelectedDate(month);
   const handleTabChange = (event, newValue) => setTabIndex(newValue);
@@ -45,6 +47,7 @@ const TransOverview = () => {
       navigate('/auth/login');
       return;
     }
+    setIsLoading(true);
     api.get(`/trans/viewAll?mth=${selectedDate}`)
       .then((response) => {
         setIncome(response.data.monthly.filter(item => item.type === true));
@@ -53,7 +56,8 @@ const TransOverview = () => {
       })
       .catch((error) => {
         setErrorMsg(error.response ? error.response.data.message : "Server Error");
-      });
+      })
+      .finally(() => setIsLoading(false));
   }, [selectedDate]);
 
   const data = useMemo(() => ({
@@ -134,6 +138,7 @@ const TransOverview = () => {
         }
       >
         {errorMsg && <Typography color="error">{errorMsg}</Typography>}
+        {isLoading && <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>}
         <Box sx={{ borderBottom: 1, borderColor: "divider", display: "flex", justifyContent: "center" }}>
           <Tabs value={tabIndex} onChange={handleTabChange}>
             <Tab label="Income" />
@@ -157,7 +162,7 @@ const TransOverview = () => {
             )}
           </Grid>
           <Grid item xs={12} md={6}>
-            <CardContent sx={{ minHeight: 250, maxHeight: 250, overflowY: "auto" }}>
+            <CardContent sx={{ minHeight: 275, maxHeight: 275, overflowY: "auto" }}>
               <Stack spacing={2}>
                 {selectedData.labels.length > 0 ? (
                   selectedData.labels.map((category, index) => (

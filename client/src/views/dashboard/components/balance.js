@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Stack, Typography, Avatar, Box, Select, MenuItem, Card, CardContent } from "@mui/material";
+import { Stack, Typography, Avatar, Box, Select, MenuItem, Card, CardContent, CircularProgress } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import getLast12Months from '../../func/func12m';
 import api from 'src/api';
 import * as TablerIcons from "@tabler/icons-react";
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { INCOME_COLOR, EXPENSE_COLOR } from 'src/helpers/transactionColors';
 import { showsweetAlert } from '../../../helpers/alert';
 
 const renderIcon = (iconName) => {
@@ -22,6 +23,7 @@ const BalanceOverview = () => {
   const [ttlIncome, setTtlIncome] = useState(0);
   const [ttlBalance, setTtlBalance] = useState(0);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
 
@@ -35,6 +37,7 @@ const BalanceOverview = () => {
       navigate('/auth/login');
       return;
     }
+    setIsLoading(true);
     api.get(`/trans/viewAll?mth=${selectedDate}`)
     .then((response) => {
       if (response.data) {
@@ -47,7 +50,8 @@ const BalanceOverview = () => {
     })
     .catch((error) => {
       setErrorMsg(error.response ? error.response.data.message : "Server Error");
-    });
+    })
+    .finally(() => setIsLoading(false));
   }, [selectedDate]);
 
   const stats = [
@@ -62,16 +66,16 @@ const BalanceOverview = () => {
     {
       title: "Income",
       subtitle: "Monthly Income",
-      amount: ttlIncome, 
-      color: "rgb(102,187,106)",
+      amount: ttlIncome,
+      color: INCOME_COLOR,
       lightcolor: "rgb(232,245,233)",
       icon: "IconReceiptTax"
     },
     {
       title: "Expenses",
       subtitle: "Monthly Expenses",
-      amount: ttlExpense, 
-      color: "rgb(250,137,107)",
+      amount: ttlExpense,
+      color: EXPENSE_COLOR,
       lightcolor: "rgb(253,237,232)",
       icon: "IconCreditCardPay"
     }
@@ -98,7 +102,7 @@ const BalanceOverview = () => {
       }
     >
       {errorMsg && <Typography color="error">{errorMsg}</Typography>}
-      
+      {isLoading && <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>}
       <Stack spacing={3} mt={2}>
         {stats.map((stat, i) => (
           <Card key={i} sx={{ backgroundColor: stat.lightcolor, boxShadow: 2 }}>

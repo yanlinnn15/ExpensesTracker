@@ -24,6 +24,7 @@ import EditBudget from './editbudget';
 import DeleteBudget from './deletebudget';
 import { showToast } from '../../helpers/showtoast';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { INCOME_COLOR, EXPENSE_COLOR } from 'src/helpers/transactionColors';
 
 function Budgets() {
   const theme = useTheme();
@@ -108,7 +109,6 @@ function Budgets() {
 
   const primary = "rgb(93,135,255)";
   const primarylight = "rgb(236,242,255)";
-  const successlight = "rgb(230, 255, 250)";
 
   return (
     <PageContainer title="Budgets" description="this is Budgets">
@@ -139,8 +139,8 @@ function Budgets() {
           <Grid container spacing={3} mb={4}>
             {[
               { title: "Total Budget", amount: ttlBudget, color: primary, bgcolor: primarylight },
-              { title: "Total Spent", amount: ttlAmount, color: theme.palette.error.main, bgcolor: "rgb(255, 231, 217)" },
-              { title: "Remaining Budget", amount: (ttlBudget - ttlAmount).toFixed(2), color: "rgb(0, 194, 146)", bgcolor: successlight }
+              { title: "Total Spent", amount: ttlAmount, color: EXPENSE_COLOR, bgcolor: "rgb(255, 231, 217)" },
+              { title: "Remaining Budget", amount: (ttlBudget - ttlAmount).toFixed(2), color: INCOME_COLOR, bgcolor: "rgb(230, 255, 230)" }
             ].map((card, index) => (
               <Grid item xs={12} md={4} key={index}>
                 <Card elevation={3} sx={{ bgcolor: card.bgcolor, transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-5px)' } }}>
@@ -170,7 +170,7 @@ function Budgets() {
                   options: {
                     chart: { type: 'donut', height: 200 },
                     labels: ['Spent', 'Remaining'],
-                    colors: [isOverBudget ? theme.palette.error.main : primary, primarylight],
+                    colors: [isOverBudget ? EXPENSE_COLOR : primary, primarylight],
                     plotOptions: { pie: { donut: { size: '75%' } } },
                     dataLabels: { enabled: false },
                     legend: { show: false },

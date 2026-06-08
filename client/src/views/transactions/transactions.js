@@ -17,7 +17,8 @@ import {
   MenuItem,
   ListItemIcon,
   Divider,
-  Stack
+  Stack,
+  CircularProgress
 } from '@mui/material';
 import { IconDots, IconPlus, IconEdit, IconTrash, IconCalendarMonth } from "@tabler/icons-react";
 import * as TablerIcons from "@tabler/icons-react"; 
@@ -30,6 +31,7 @@ import AddTransactionModal from './addtrans';
 import EditTrans from './edittrans';
 import DeleteTrans from './dlttrans';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import { INCOME_COLOR, EXPENSE_COLOR } from 'src/helpers/transactionColors';
 import { showsweetAlert } from 'src/helpers/alert';
 
 const renderIcon = (iconName) => {
@@ -54,6 +56,7 @@ const Transactions = () => {
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [selectedTransac, setSelectedTransac] = useState([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [transOpen, setTransOpen] = useState(false);
     const handleTransOpen = () => setTransOpen(true);
     const handleTransClose = () => setTransOpen(false);
@@ -171,6 +174,7 @@ const Transactions = () => {
             return;
         }
 
+        setIsLoading(true);
         api.get(`/trans/viewAll?mth=${selectedDate}`)
         .then((response) => {
             if (response.data) {
@@ -195,7 +199,7 @@ const Transactions = () => {
             } else {
                 setErrorMsg("Server Error");
             }
-        });
+        }).finally(() => setIsLoading(false));
     }, [selectedDate]);
 
     return (
@@ -302,7 +306,13 @@ const Transactions = () => {
                                 <TableBody>
                                 {/* <Button onClick={() => setAddExpenseOpen(true)}>Add Expense</Button> */}
 
-                                    {trans.length === 0 ? (
+                                                    {isLoading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={3} align="center">
+                                                <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : trans.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={3} align="center">
                                                 <CardContent>No transaction.</CardContent>
@@ -330,8 +340,8 @@ const Transactions = () => {
                                                             </Box>
                                                         </TableCell>
                                                         <TableCell>
-                                                            <Typography variant="subtitle1" color="textPrimary">
-                                                                {tran.type ? "+" : "-"} {tran.amount}
+                                                            <Typography variant="subtitle1" sx={{ whiteSpace: 'nowrap', color: tran.type ? INCOME_COLOR : EXPENSE_COLOR }}>
+                                                                {tran.type ? "+" : "-"}{tran.amount}
                                                             </Typography>
                                                         </TableCell>
                                                         <TableCell align='right'>
