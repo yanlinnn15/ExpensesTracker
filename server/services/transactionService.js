@@ -39,19 +39,20 @@ const getMonthly = async (userId, mth) => {
 
     const monthly = await Transactions.findAll({
         attributes: [
-            [fn('YEAR',  col('date')), 'year'],
-            [fn('MONTH', col('date')), 'month'],
-            [fn('SUM',   col('amount')), 'totalAmount'],
+            [fn('DATE_PART', 'year',  col('date')), 'year'],
+            [fn('DATE_PART', 'month', col('date')), 'month'],
+            [fn('SUM', col('amount')), 'totalAmount'],
             [col('type'), 'type'],
+            'CategoryId',
         ],
         where: whereClause,
-        group: [fn('YEAR', col('date')), fn('MONTH', col('date')), 'CategoryId', 'type'],
-        order: [[fn('YEAR', col('date')), 'DESC'], [fn('MONTH', col('date')), 'DESC']],
-        include: [withCatIcon],
+        include: [{ model: Categories, attributes: ['name'] }],
+        group: [fn('DATE_PART', 'year', col('date')), fn('DATE_PART', 'month', col('date')), 'CategoryId', 'type', 'Category.id', 'Category.name'],
+        order: [[fn('DATE_PART', 'year', col('date')), 'DESC'], [fn('DATE_PART', 'month', col('date')), 'DESC']],
     });
 
-    const ttlIncome  = await Transactions.sum('amount', { where: { ...whereClause, type: 1 } });
-    const ttlExpense = await Transactions.sum('amount', { where: { ...whereClause, type: 0 } });
+    const ttlIncome  = await Transactions.sum('amount', { where: { ...whereClause, type: true } });
+    const ttlExpense = await Transactions.sum('amount', { where: { ...whereClause, type: false } });
 
     return {
         transaction: transaction || [],
@@ -72,19 +73,19 @@ const getYearlySummary = async (userId) => {
         },
     };
 
-    const groupBy = [fn('YEAR', col('date')), fn('MONTH', col('date'))];
-    const order   = [[fn('YEAR', col('date')), 'DESC'], [fn('MONTH', col('date')), 'DESC']];
+    const groupBy = [fn('DATE_PART', 'year', col('date')), fn('DATE_PART', 'month', col('date'))];
+    const order   = [[fn('DATE_PART', 'year', col('date')), 'DESC'], [fn('DATE_PART', 'month', col('date')), 'DESC']];
     const attrs   = [
-        [fn('YEAR',  col('date')), 'year'],
-        [fn('MONTH', col('date')), 'month'],
-        [fn('SUM',   col('amount')), 'totalAmount'],
+        [fn('DATE_PART', 'year',  col('date')), 'year'],
+        [fn('DATE_PART', 'month', col('date')), 'month'],
+        [fn('SUM', col('amount')), 'totalAmount'],
     ];
 
-    const monthlyE = await Transactions.findAll({ attributes: attrs, where: { ...whereClause, type: 0 }, group: groupBy, order });
-    const monthlyI = await Transactions.findAll({ attributes: attrs, where: { ...whereClause, type: 1 }, group: groupBy, order });
+    const monthlyE = await Transactions.findAll({ attributes: attrs, where: { ...whereClause, type: false }, group: groupBy, order });
+    const monthlyI = await Transactions.findAll({ attributes: attrs, where: { ...whereClause, type: true  }, group: groupBy, order });
 
-    const ttlIncome  = await Transactions.sum('amount', { where: { ...whereClause, type: 1 } });
-    const ttlExpense = await Transactions.sum('amount', { where: { ...whereClause, type: 0 } });
+    const ttlIncome  = await Transactions.sum('amount', { where: { ...whereClause, type: true  } });
+    const ttlExpense = await Transactions.sum('amount', { where: { ...whereClause, type: false } });
     const surplus    = (ttlIncome || 0) - (ttlExpense || 0);
 
     return {

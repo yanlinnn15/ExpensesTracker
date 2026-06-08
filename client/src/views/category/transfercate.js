@@ -33,6 +33,7 @@ function TransferCate({ open, onClose, CateId, onProcessing }) {
 
 
     useEffect(() => {
+        if (!CateId) return;
         if (!isAuthenticated()) {
             navigate("/auth/login");
             return;

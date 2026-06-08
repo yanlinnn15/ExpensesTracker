@@ -23,9 +23,11 @@ const create = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid category ID');
         const { name, IconId, is_income } = req.body;
         validate(CategoriesSchema, { name, IconId, is_income });
-        const category = await categoryService.update(req.params.id, req.user.id, { name, IconId, is_income });
+        const category = await categoryService.update(id, req.user.id, { name, IconId, is_income });
         if (!category) throw new AppError(404, 'Category Not Found');
         res.status(200).json({ message: 'Category updated successfully', category });
     } catch (e) { next(e); }
@@ -41,7 +43,9 @@ const getAll = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
     try {
-        const cate = await categoryService.getById(req.params.id);
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid category ID');
+        const cate = await categoryService.getById(id);
         if (!cate) throw new AppError(404, 'Category Not Found');
         res.status(200).json(cate);
     } catch (e) { next(e); }
@@ -49,7 +53,9 @@ const getById = async (req, res, next) => {
 
 const getOthersByType = async (req, res, next) => {
     try {
-        const categories = await categoryService.getOthersByType(req.params.id, req.user.id);
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid category ID');
+        const categories = await categoryService.getOthersByType(id, req.user.id);
         if (!categories) throw new AppError(404, 'Category Not Found');
         res.status(200).json(categories);
     } catch (e) { next(e); }
@@ -57,7 +63,9 @@ const getOthersByType = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
     try {
-        const deleted = await categoryService.remove(req.params.id, req.user.id);
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid category ID');
+        const deleted = await categoryService.remove(id, req.user.id);
         if (!deleted) throw new AppError(404, 'Category not found');
         res.status(200).json({ message: 'Category deleted successfully' });
     } catch (e) { next(e); }

@@ -32,6 +32,7 @@ app.use('/auth/register', authLimiter);
 app.use('/auth/guest',    authLimiter);
 
 const db = require('./models');
+const seedIcons = require('./seeders/seedIcons');
 
 const usersRouter = require('./routes/Users');
 app.use('/auth', usersRouter);
@@ -55,8 +56,9 @@ const PORT = process.env.PORT || 3001;
 
 const syncOptions = process.env.NODE_ENV === 'production' ? {} : { alter: true };
 db.sequelize.sync(syncOptions).then(async () => {
-    // Delete abandoned guest accounts older than 24 hours
-    const { Users } = db;
+    const { Users, Icons } = db;
+
+    await seedIcons(Icons, logger);
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const deleted = await Users.destroy({
         where: { isGuest: true, createdAt: { [Op.lt]: cutoff } }

@@ -26,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         active:{
             type: DataTypes.BOOLEAN,
-            defaultValue:1,
+            defaultValue: true,
         },
         verify:{
             type: DataTypes.BOOLEAN,
-            defaultValue:0,
+            defaultValue: false,
         },
         verifyToken:{
             type: DataTypes.STRING,

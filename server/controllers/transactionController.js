@@ -39,7 +39,9 @@ const getYearlySummary = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
     try {
-        const transaction = await transactionService.getById(req.params.id, req.user.id);
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid transaction ID');
+        const transaction = await transactionService.getById(id, req.user.id);
         if (!transaction) throw new AppError(404, 'Transaction Not Found');
         res.status(200).json(transaction);
     } catch (e) { next(e); }
@@ -47,14 +49,18 @@ const getById = async (req, res, next) => {
 
 const countByCategory = async (req, res, next) => {
     try {
-        const { count, rows } = await transactionService.countByCategory(req.user.id, req.params.id);
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid category ID');
+        const { count, rows } = await transactionService.countByCategory(req.user.id, id);
         res.status(200).json({ countT: count, cate: rows });
     } catch (e) { next(e); }
 };
 
 const remove = async (req, res, next) => {
     try {
-        const deleted = await transactionService.remove(req.params.id, req.user.id);
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid transaction ID');
+        const deleted = await transactionService.remove(id, req.user.id);
         if (!deleted) throw new AppError(404, 'Transaction Not Found');
         res.status(200).json({ message: 'Transaction deleted successfully' });
     } catch (e) { next(e); }
@@ -69,9 +75,11 @@ const removeByCategory = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
+        const id = parseInt(req.params.id);
+        if (!id) throw new AppError(400, 'Invalid transaction ID');
         const { date, amount, remark, CategoryId } = req.body;
         validate(ESchema, { date, amount, remark, CategoryId });
-        const result = await transactionService.update(req.params.id, req.user.id, { date, amount, remark, CategoryId });
+        const result = await transactionService.update(id, req.user.id, { date, amount, remark, CategoryId });
         if (!result)                 throw new AppError(404, 'Transaction Not Found');
         if (result.categoryNotFound) throw new AppError(404, 'Category Not Found');
         res.status(200).json({ message: 'Transaction updated successfully', transaction: result });
