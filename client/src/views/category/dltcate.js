@@ -30,21 +30,22 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
     const [selectedCateId, setSelectedCateId] = useState(null);
 
     useEffect(() => {
+        if (!CateId) return;
         if (!isAuthenticated()) {
             navigate("/auth/login");
-            return; 
+            return;
         }
 
         setIsLoading(true);
         api.get(`/trans/count/${CateId}`)
         .then((response) => {
-            setCount(Number(response.data.countT)); 
+            setCount(Number(response.data.countT));
         })
         .catch((error) => {
             handleError(error);
         })
         .finally(() => {
-            setIsLoading(false); 
+            setIsLoading(false);
         });
 
     }, [CateId, navigate]);

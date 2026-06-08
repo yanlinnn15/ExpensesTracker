@@ -21,11 +21,11 @@ const getAll = async (userId) => {
         include: [{ model: Icons }],
     });
 
-    const cateincome  = await Categories.findAll({ where: { UserId: userId, is_income: 1 }, include: [{ model: Icons }] });
-    const cateexpense = await Categories.findAll({ where: { UserId: userId, is_income: 0 }, include: [{ model: Icons }] });
+    const cateincome  = await Categories.findAll({ where: { UserId: userId, is_income: true  }, include: [{ model: Icons }] });
+    const cateexpense = await Categories.findAll({ where: { UserId: userId, is_income: false }, include: [{ model: Icons }] });
 
     const catebudgetRaw = await Categories.findAll({
-        where: { UserId: userId, is_income: 0 },
+        where: { UserId: userId, is_income: false },
         include: [
             { model: Icons },
             { model: Budgets, where: { UserId: userId }, required: false },

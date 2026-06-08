@@ -8,12 +8,12 @@ const { sendVerificationEmail, sendForgotEmail } = require('./emailService');
 const DUMMY_HASH = bcrypt.hashSync('dummy-timing-normalization', 10);
 
 const DEFAULT_CATEGORIES = [
-    { name: 'Salary',     is_income: 1, IconId: 1 },
-    { name: 'Part Time',  is_income: 1, IconId: 2 },
-    { name: 'Food',       is_income: 0, IconId: 6 },
-    { name: 'Transport',  is_income: 0, IconId: 9 },
-    { name: 'Essentials', is_income: 0, IconId: 8 },
-    { name: 'Shopping',   is_income: 0, IconId: 7 },
+    { name: 'Salary',     is_income: true,  IconId: 1 },
+    { name: 'Part Time',  is_income: true,  IconId: 2 },
+    { name: 'Food',       is_income: false, IconId: 6 },
+    { name: 'Transport',  is_income: false, IconId: 9 },
+    { name: 'Essentials', is_income: false, IconId: 8 },
+    { name: 'Shopping',   is_income: false, IconId: 7 },
 ];
 
 const seedDefaultCategories = async (userId, t) => {
