@@ -93,8 +93,11 @@ const Balances = () => {
     <PageContainer title="Balances" description="Balance Page">
       <DashboardCard title="Balances">
         {errormsg && <Alert severity="warning" sx={{ mb: 2 }}>{errormsg}</Alert>}
-        {isLoading && <Box display="flex" justifyContent="center" my={4}><CircularProgress /></Box>}
-        <Container maxWidth="lg" disableGutters>
+        {isLoading ? (
+          <Box display="flex" justifyContent="center" my={6}><CircularProgress /></Box>
+        ) : (
+          <>
+          <Container maxWidth="lg" disableGutters>
           <Grid container spacing={3} justifyContent="center">
             <Grid item xs={12}>
               <Card variant="outlined">
@@ -205,6 +208,8 @@ const Balances = () => {
             </TableContainer>
           </Card>
         </Container>
+          </>
+        )}
       </DashboardCard>
     </PageContainer>
   );

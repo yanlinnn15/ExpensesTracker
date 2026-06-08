@@ -8,13 +8,12 @@ import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 import { showsweetAlert } from '../../helpers/alert';
+import { modalStyle as style } from 'src/helpers/modalStyle';
 
 const renderIcon = (iconName) => {
-    const IconComponent = TablerIcons[iconName]; 
+    const IconComponent = TablerIcons[iconName];
     return IconComponent ? <IconComponent /> : <TablerIcons.IconHelp />;
 };
-
-import { modalStyle as style } from 'src/helpers/modalStyle';
 
 const validationSchema = Yup.object({
     CategoryId: Yup.number().required("Category is required"),
