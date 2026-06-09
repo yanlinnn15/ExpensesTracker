@@ -10,10 +10,11 @@ import { modalStyle as style } from 'src/helpers/modalStyle';
 
 function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
     const navigate = useNavigate();
-    const [Count, setCount] = useState(0); // Initialize to 0
+    const [Count, setCount] = useState(0);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [isCountLoading, setIsCountLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [openTransModal, setOpenTransModal] = useState(false);
     const [selectedCateId, setSelectedCateId] = useState(null);
 
@@ -24,7 +25,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
             return;
         }
 
-        setIsLoading(true);
+        setIsCountLoading(true);
         api.get(`/trans/count/${CateId}`)
         .then((response) => {
             setCount(Number(response.data.countT));
@@ -33,7 +34,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
             handleError(error);
         })
         .finally(() => {
-            setIsLoading(false);
+            setIsCountLoading(false);
         });
 
     }, [CateId, navigate]);
@@ -54,15 +55,15 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
 
     const handleDelete = async () => {
         setOpenTransModal(false);
-        setIsLoading(true);
+        setIsDeleting(true);
         try {
             await api.delete(`/cate/dlt/${CateId}`);
-            onCateDeleted(CateId); 
+            onCateDeleted(CateId);
             onClose();
         } catch (error) {
             handleError(error);
         } finally {
-            setIsLoading(false);
+            setIsDeleting(false);
         }
     };
 
@@ -76,28 +77,30 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
                     <IconSquareRoundedX />
                 </IconButton>
 
-                {Count === 0 ? (
+                {isCountLoading ? (
+                    <Typography>Loading...</Typography>
+                ) : Count === 0 ? (
                     <>
                         <Typography>Are you sure you want to delete this Category?</Typography>
                         <Box mt={2} display="flex" justifyContent="space-between">
                             <Button onClick={onClose} variant="outlined" color="secondary">
                                 Cancel
                             </Button>
-                            <Button onClick={handleDelete} variant="contained" color="error" disabled={isLoading}>
-                                {isLoading ? "Deleting..." : "Delete"}
+                            <Button onClick={handleDelete} variant="contained" color="error" disabled={isDeleting}>
+                                {isDeleting ? "Deleting..." : "Delete"}
                             </Button>
                         </Box>
                     </>
                 ) : (
                     <>
-                        <Typography>Are you sure you want to delete this category? 
+                        <Typography>Are you sure you want to delete this category?
                             Deleting this category will also remove all transactions associated with it.</Typography>
                         <Box mt={2} display="flex" justifyContent="space-between">
                             <Button onClick={() => handleTransClick(CateId)} variant="outlined" color="secondary">
                                 Transfer Data
                             </Button>
-                            <Button onClick={handleDelete} variant="contained" color="error" disabled={isLoading}>
-                                {isLoading ? "Deleting..." : "Delete"}
+                            <Button onClick={handleDelete} variant="contained" color="error" disabled={isDeleting}>
+                                {isDeleting ? "Deleting..." : "Delete"}
                             </Button>
                         </Box>
                     </>

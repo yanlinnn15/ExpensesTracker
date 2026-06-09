@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';  
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, CircularProgress } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
@@ -63,11 +63,10 @@ function AddExpenses({ open, onClose, getExpenses }) {
     });
   }, []);
 
-  const onSubmit = (data) => {    
+  const onSubmit = (data, { setSubmitting }) => {
     api.post("/trans/", data).then((response) => {
         if (response.data && response.data.trans) {
             const category = cate.find(c => c.id === data.CategoryId);
-            
             const transaction = {
                 ...response.data.trans,
                 Category: {
@@ -83,7 +82,7 @@ function AddExpenses({ open, onClose, getExpenses }) {
         const message = error.response ? error.response.data.message : error.message;
         setDialogMessage(message);
         setDialogOpen(true);
-    });
+    }).finally(() => setSubmitting(false));
 };
 
   return (
@@ -100,7 +99,7 @@ function AddExpenses({ open, onClose, getExpenses }) {
           onSubmit={onSubmit}
           validationSchema={validationSchema}
         >
-          {({ handleChange, values, errors, touched }) => (
+          {({ handleChange, values, errors, touched, isSubmitting }) => (
             <Form className="formContainer">
               <FormControl fullWidth margin="normal">
                 <TextField
@@ -164,8 +163,8 @@ function AddExpenses({ open, onClose, getExpenses }) {
                 />
               </FormControl>
 
-              <Button type="submit" variant="contained" color="primary" fullWidth startIcon={<IconPlus />}>
-                Add Expense
+              <Button type="submit" variant="contained" color="primary" fullWidth disabled={isSubmitting} startIcon={isSubmitting ? null : <IconPlus />}>
+                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Add Expense"}
               </Button>
             </Form>
           )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, CircularProgress } from '@mui/material';
 import { useFormik, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
@@ -61,15 +61,15 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
             remark: ''
         },
         validationSchema: validationSchema,
-        onSubmit: (data) => {
+        onSubmit: (data, { setSubmitting }) => {
             api.post('/budget/', data)
-            .then((response) => {        
+            .then((response) => {
                 if (response.data) {
                     const updatedBudget = {
                         ...response.data,
                         Icon: {
                             icon_name: response.data.Category?.Icon.icon_name || 'IconHelp',
-                            icon_class: response.data.Category?.Icon.icon_class || 'IconHelp' 
+                            icon_class: response.data.Category?.Icon.icon_class || 'IconHelp'
                         },
                         Category: {
                             id: response.data.CategoryId,
@@ -83,9 +83,8 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
                         },
                         totalSpent: response.data.totalSpent || 0
                     };
-
                     onBudgetAdded(updatedBudget);
-                    formik.resetForm(); 
+                    formik.resetForm();
                     onClose();
                 } else {
                     handleError({ message: "No Budget returned in response." });
@@ -93,7 +92,8 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
             })
             .catch((error) => {
                 handleError(error);
-            });
+            })
+            .finally(() => setSubmitting(false));
         },
     });
 
@@ -166,8 +166,8 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
                             />
                         </FormControl>
 
-                        <Button type="submit" variant="contained" color="primary" fullWidth startIcon={<IconPlus />}>
-                            Add
+                        <Button type="submit" variant="contained" color="primary" fullWidth disabled={formik.isSubmitting} startIcon={formik.isSubmitting ? null : <IconPlus />}>
+                            {formik.isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Add"}
                         </Button>
                     </form>
                 )}

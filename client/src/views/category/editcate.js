@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';  
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
@@ -61,9 +61,9 @@ function EditCate({ open, onClose, onCateAdded, CateId, cate }) {
         },
         validationSchema: validationSchema,
         enableReinitialize: true,
-        onSubmit: (data) => {    
+        onSubmit: (data, { setSubmitting }) => {
             api.patch(`/cate/edit/${CateId}`, data)
-            .then((response) => {        
+            .then((response) => {
                 if (response.data && response.data.category) {
                     const updatedCategory = {
                         ...response.data.category,
@@ -80,7 +80,8 @@ function EditCate({ open, onClose, onCateAdded, CateId, cate }) {
             })
             .catch((error) => {
                 handleError(error);
-            });
+            })
+            .finally(() => setSubmitting(false));
         },
     });
 
@@ -130,8 +131,8 @@ function EditCate({ open, onClose, onCateAdded, CateId, cate }) {
                             <div style={{ color: 'red' }}>{formik.touched.IconId && formik.errors.IconId}</div>
                         </FormControl>
 
-                        <Button type="submit" variant="contained" color="primary" fullWidth >
-                            Edit
+                        <Button type="submit" variant="contained" color="primary" fullWidth disabled={formik.isSubmitting} startIcon={formik.isSubmitting ? null : <IconPlus />}>
+                            {formik.isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Edit"}
                         </Button>
                     </form>
                 )}

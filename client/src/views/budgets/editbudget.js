@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, TextField, IconButton, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
@@ -48,13 +48,13 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
         },
         validationSchema: validationSchema,
         enableReinitialize: true,
-        onSubmit: (data) => {
+        onSubmit: (data, { setSubmitting }) => {
             api.patch(`/budget/edit/${Bid}`, data)
-            .then((response) => {        
+            .then((response) => {
                 if (response.data) {
                     const updatedBudget = response.data;
                     onBudgetAdded(updatedBudget);
-                    formik.resetForm(); 
+                    formik.resetForm();
                     onClose();
                 } else {
                     handleError({ message: "No Budget returned in response." });
@@ -62,7 +62,8 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
             })
             .catch((error) => {
                 handleError(error);
-            });
+            })
+            .finally(() => setSubmitting(false));
         },
     });
 
@@ -104,8 +105,8 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
                             />
                         </FormControl>
 
-                        <Button type="submit" variant="contained" color="primary" fullWidth startIcon={<IconPlus />}>
-                            Edit
+                        <Button type="submit" variant="contained" color="primary" fullWidth disabled={formik.isSubmitting} startIcon={formik.isSubmitting ? null : <IconPlus />}>
+                            {formik.isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Edit"}
                         </Button>
                     </form>
                 )}

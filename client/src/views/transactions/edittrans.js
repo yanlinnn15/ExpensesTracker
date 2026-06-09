@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';  
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
@@ -79,11 +79,10 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
         },
         validationSchema: validationSchema,
         enableReinitialize: true,
-        onSubmit: (data) => {    
+        onSubmit: (data, { setSubmitting }) => {
             api.patch(`/trans/edit/${transactionId}`, data)
-            .then((response) => {        
+            .then((response) => {
                 const category = cate.find(c => c.id === data.CategoryId);
-                
                 const transaction = {
                     ...response.data.transaction,
                     Category: {
@@ -96,7 +95,8 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
             })
             .catch((error) => {
                 handleError(error);
-            });
+            })
+            .finally(() => setSubmitting(false));
         },
     });
 
@@ -173,8 +173,8 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
                             />
                         </FormControl>
 
-                        <Button type="submit" variant="contained" color="primary" fullWidth startIcon={<IconPlus />}>
-                            Edit
+                        <Button type="submit" variant="contained" color="primary" fullWidth disabled={formik.isSubmitting} startIcon={formik.isSubmitting ? null : <IconPlus />}>
+                            {formik.isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Edit"}
                         </Button>
                     </form>
                 )}

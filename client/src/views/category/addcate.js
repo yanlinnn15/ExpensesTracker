@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';  
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, FormControlLabel, Radio, RadioGroup } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Box, Typography, Button, FormControl, InputLabel, Select, MenuItem, TextField, IconButton, FormControlLabel, Radio, RadioGroup, CircularProgress } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { IconPlus, IconSquareRoundedX } from '@tabler/icons-react';
@@ -61,9 +61,9 @@ function AddCate({ open, onClose, onCateAdded}) {
             is_income: null,
         },
         validationSchema: validationSchema,
-        onSubmit: (data) => {  
+        onSubmit: (data, { setSubmitting }) => {
             api.post('/cate/', data)
-            .then((response) => {        
+            .then((response) => {
                 if (response.data) {
                     const updatedCategory = {
                         ...response.data,
@@ -73,7 +73,7 @@ function AddCate({ open, onClose, onCateAdded}) {
                         }
                     };
                     onCateAdded(updatedCategory);
-                    formik.resetForm(); 
+                    formik.resetForm();
                     onClose();
                 } else {
                     handleError({ message: "No category returned in response." });
@@ -81,7 +81,8 @@ function AddCate({ open, onClose, onCateAdded}) {
             })
             .catch((error) => {
                 handleError(error);
-            });
+            })
+            .finally(() => setSubmitting(false));
         },
     });
 
@@ -148,8 +149,8 @@ function AddCate({ open, onClose, onCateAdded}) {
                             )}
                         </FormControl>
 
-                        <Button type="submit" variant="contained" color="primary" fullWidth startIcon={<IconPlus />}>
-                            Add
+                        <Button type="submit" variant="contained" color="primary" fullWidth disabled={formik.isSubmitting} startIcon={formik.isSubmitting ? null : <IconPlus />}>
+                            {formik.isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Add"}
                         </Button>
                     </form>
                 )}
