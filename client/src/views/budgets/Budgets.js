@@ -146,7 +146,7 @@ function Budgets() {
                 <Card elevation={3} sx={{ bgcolor: card.bgcolor, transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-5px)' } }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom color="textSecondary">{card.title}</Typography>
-                    <Typography variant="h4" color={card.color} sx={{ fontWeight: 'bold' }}>RM {card.amount.toLocaleString()}</Typography>
+                    <Typography variant="h4" color={card.color} sx={{ fontWeight: 'bold' }}>RM {parseFloat(card.amount).toFixed(2)}</Typography>
                   </CardContent>
                 </Card>
               </Grid>
@@ -199,10 +199,10 @@ function Budgets() {
                           <Chart options={pieChartOptions.options} series={pieChartOptions.series} type="donut" width="200px" />
                         </Box>
                         <Typography variant="h6" align="center" gutterBottom>
-                          RM {(budget.totalSpent.toFixed(2)).toLocaleString()} / RM {budget.amount.toLocaleString()}
+                          RM {parseFloat(budget.totalSpent).toFixed(2)} / RM {parseFloat(budget.amount).toFixed(2)}
                         </Typography>
                         <Box display="flex" alignItems="center" justifyContent="center">
-                          <Avatar sx={{ bgcolor: successlight, width: 24, height: 24, mr: 1 }}>
+                          <Avatar sx={{ bgcolor: 'rgb(230, 255, 230)', width: 24, height: 24, mr: 1 }}>
                             <IconCircleCheck size={16} color="#4caf50" />
                           </Avatar>
                           <Typography variant="body2">{percentage}% of budget used</Typography>
