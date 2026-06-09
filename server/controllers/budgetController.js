@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const budgetService = require('../services/budgetService');
 const AppError = require('../middlewares/AppError');
+const { logEvent, EVENTS } = require('../utils/eventLogger');
 
 const BSchema = Joi.object({
     amount:     Joi.number().precision(2).min(0.01).max(99999999999999999999.99),
@@ -18,6 +19,7 @@ const create = async (req, res, next) => {
         validate(BSchema, req.body);
         const result = await budgetService.create(req.user.id, req.body);
         if (result.conflict) throw new AppError(400, 'Budget already created for this Category!');
+        logEvent(EVENTS.BUDGET_CREATED, req.user.id, { categoryId: req.body.CategoryId, amount: req.body.amount });
         res.status(201).json({ message: 'Budgets Created Successfully!' });
     } catch (e) { next(e); }
 };
@@ -35,6 +37,7 @@ const remove = async (req, res, next) => {
         if (!id) throw new AppError(400, 'Invalid budget ID');
         const deleted = await budgetService.remove(id, req.user.id);
         if (!deleted) throw new AppError(404, 'Budget Not Found');
+        logEvent(EVENTS.BUDGET_DELETED, req.user.id, { budgetId: id });
         res.status(200).json({ message: 'Success' });
     } catch (e) { next(e); }
 };
@@ -47,6 +50,7 @@ const update = async (req, res, next) => {
         validate(BSchema, { amount, remark });
         const budget = await budgetService.update(id, req.user.id, { amount, remark });
         if (!budget) throw new AppError(404, 'Budget Not Found');
+        logEvent(EVENTS.BUDGET_UPDATED, req.user.id, { budgetId: id, amount });
         res.status(200).json({ message: 'Budget updated successfully', budget });
     } catch (e) { next(e); }
 };

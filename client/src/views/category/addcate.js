@@ -8,6 +8,7 @@ import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 import { modalStyle as style } from 'src/helpers/modalStyle';
+import logger from 'src/helpers/logger';
 
 const renderIcon = (iconName) => {
     const IconComponent = TablerIcons[iconName];
@@ -49,7 +50,7 @@ function AddCate({ open, onClose, onCateAdded}) {
         const message = error.response 
             ? error.response.data.message || error.message 
             : error.message;
-        console.error("Error:", message);  
+        logger.error("Error:", message);
         setDialogMessage(message);
         setDialogOpen(true);
     };
@@ -62,7 +63,7 @@ function AddCate({ open, onClose, onCateAdded}) {
         },
         validationSchema: validationSchema,
         onSubmit: (data, { setSubmitting }) => {
-            api.post('/cate/', data)
+            return api.post('/cate/', data)
             .then((response) => {
                 if (response.data) {
                     const updatedCategory = {

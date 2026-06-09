@@ -15,6 +15,7 @@ import {
   IconUserCircle
 } from '@tabler/icons-react';
 import { AuthContext } from '../../../helpers/AuthContext';
+import logger from '../../../helpers/logger';
 import {  IconUser } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,7 +35,7 @@ const Profile = () => {
       try {
         await api.delete('/auth/guest');
       } catch (e) {
-        console.error('Failed to delete guest account:', e);
+        logger.error('Failed to delete guest account:', e);
       }
     }
     localStorage.removeItem('accessToken');

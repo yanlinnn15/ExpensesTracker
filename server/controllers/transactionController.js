@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const transactionService = require('../services/transactionService');
 const AppError = require('../middlewares/AppError');
+const { logEvent, EVENTS } = require('../utils/eventLogger');
 
 const ESchema = Joi.object({
     date:       Joi.date().iso(),
@@ -19,6 +20,7 @@ const create = async (req, res, next) => {
     try {
         validate(ESchema, req.body);
         const trans = await transactionService.create(req.user.id, req.body);
+        logEvent(EVENTS.TRANSACTION_CREATED, req.user.id, { transactionId: trans.id, amount: trans.amount, type: trans.type });
         res.status(201).json({ message: 'Transactions Created Successfully!', trans });
     } catch (e) { next(e); }
 };
@@ -62,6 +64,7 @@ const remove = async (req, res, next) => {
         if (!id) throw new AppError(400, 'Invalid transaction ID');
         const deleted = await transactionService.remove(id, req.user.id);
         if (!deleted) throw new AppError(404, 'Transaction Not Found');
+        logEvent(EVENTS.TRANSACTION_DELETED, req.user.id, { transactionId: id });
         res.status(200).json({ message: 'Transaction deleted successfully' });
     } catch (e) { next(e); }
 };
@@ -82,6 +85,7 @@ const update = async (req, res, next) => {
         const result = await transactionService.update(id, req.user.id, { date, amount, remark, CategoryId });
         if (!result)                 throw new AppError(404, 'Transaction Not Found');
         if (result.categoryNotFound) throw new AppError(404, 'Category Not Found');
+        logEvent(EVENTS.TRANSACTION_UPDATED, req.user.id, { transactionId: id, amount, CategoryId });
         res.status(200).json({ message: 'Transaction updated successfully', transaction: result });
     } catch (e) { next(e); }
 };

@@ -8,6 +8,7 @@ import * as TablerIcons from "@tabler/icons-react";
 import SelectTransCate from './selecttranscate';
 
 import { modalStyle } from 'src/helpers/modalStyle';
+import logger from 'src/helpers/logger';
 const style = { ...modalStyle, width: '90%', maxWidth: 600, overflowY: 'auto', maxHeight: '80vh' };
 
 function TransferCate({ open, onClose, CateId, onProcessing }) {
@@ -37,7 +38,7 @@ function TransferCate({ open, onClose, CateId, onProcessing }) {
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
+            logger.error("Error:", error);
         });
     }, [CateId, navigate]);  
 

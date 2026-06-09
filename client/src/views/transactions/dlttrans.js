@@ -5,6 +5,7 @@ import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 import { modalStyle as style } from 'src/helpers/modalStyle';
+import logger from 'src/helpers/logger';
 
 function DeleteTrans({ open, onClose, onTransactionDeleted, transactionId }) {
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ function DeleteTrans({ open, onClose, onTransactionDeleted, transactionId }) {
         const message = error.response 
             ? error.response.data.message || error.message 
             : error.message;
-        console.error("Error:", message);
+        logger.error("Error:", message);
         setDialogMessage(message);
         setDialogOpen(true);
     };

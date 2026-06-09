@@ -62,7 +62,7 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
         },
         validationSchema: validationSchema,
         onSubmit: (data, { setSubmitting }) => {
-            api.post('/budget/', data)
+            return api.post('/budget/', data)
             .then((response) => {
                 if (response.data) {
                     const updatedBudget = {

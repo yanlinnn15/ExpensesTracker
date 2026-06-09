@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const categoryService = require('../services/categoryService');
 const AppError = require('../middlewares/AppError');
+const { logEvent, EVENTS } = require('../utils/eventLogger');
 
 const CategoriesSchema = Joi.object({
     name:      Joi.string().min(1).max(255),
@@ -17,6 +18,7 @@ const create = async (req, res, next) => {
     try {
         validate(CategoriesSchema, req.body);
         await categoryService.create(req.user.id, req.body);
+        logEvent(EVENTS.CATEGORY_CREATED, req.user.id, { name: req.body.name, is_income: req.body.is_income });
         res.status(201).json({ message: 'Category Created Successfully!' });
     } catch (e) { next(e); }
 };
@@ -29,6 +31,7 @@ const update = async (req, res, next) => {
         validate(CategoriesSchema, { name, IconId, is_income });
         const category = await categoryService.update(id, req.user.id, { name, IconId, is_income });
         if (!category) throw new AppError(404, 'Category Not Found');
+        logEvent(EVENTS.CATEGORY_UPDATED, req.user.id, { categoryId: id, name });
         res.status(200).json({ message: 'Category updated successfully', category });
     } catch (e) { next(e); }
 };
@@ -67,6 +70,7 @@ const remove = async (req, res, next) => {
         if (!id) throw new AppError(400, 'Invalid category ID');
         const deleted = await categoryService.remove(id, req.user.id);
         if (!deleted) throw new AppError(404, 'Category not found');
+        logEvent(EVENTS.CATEGORY_DELETED, req.user.id, { categoryId: id });
         res.status(200).json({ message: 'Category deleted successfully' });
     } catch (e) { next(e); }
 };

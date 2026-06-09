@@ -1,6 +1,8 @@
 const Joi = require('joi');
 const authService = require('../services/authService');
 const AppError = require('../middlewares/AppError');
+const logger = require('../utils/logger');
+const { logEvent, EVENTS } = require('../utils/eventLogger');
 
 const USchema = Joi.object({
     fname:    Joi.string().min(1).max(255).required(),
@@ -44,7 +46,12 @@ const register = async (req, res, next) => {
         const { fname, lname, email, password } = req.body;
         validate(USchema, { fname, lname, email, password });
         const result = await authService.register({ fname, lname, email, password });
-        if (result.conflict) throw new AppError(400, 'An account with this email already exists. Please log in.');
+        if (result.conflict) {
+            logger.warn(`Register failed - email already exists: ${email}`);
+            throw new AppError(400, 'An account with this email already exists. Please log in.');
+        }
+        logger.info(`New registration: ${email}`);
+        logEvent(EVENTS.USER_REGISTERED, null, { email });
         res.status(201).json({ message: 'Sign Up Successful. Please log in to your account.', showDialog: true });
     } catch (e) { next(e); }
 };
@@ -110,6 +117,8 @@ const forgotPass = async (req, res, next) => {
 const createGuest = async (req, res, next) => {
     try {
         const data = await authService.createGuest();
+        logger.info(`Guest session created: user ${data.id}`);
+        logEvent(EVENTS.GUEST_CREATED, data.id);
         res.json(data);
     } catch (e) { next(e); }
 };
@@ -126,8 +135,16 @@ const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const result = await authService.login(email, password);
-        if (result.invalid)  throw new AppError(400, 'Invalid Email or Password!');
-        if (result.inactive) throw new AppError(400, 'Your account is Inactive.');
+        if (result.invalid) {
+            logger.warn(`Login failed - invalid credentials: ${email}`);
+            throw new AppError(400, 'Invalid Email or Password!');
+        }
+        if (result.inactive) {
+            logger.warn(`Login failed - inactive account: ${email}`);
+            throw new AppError(400, 'Your account is Inactive.');
+        }
+        logger.info(`Login success: user ${result.id} (${email})`);
+        logEvent(EVENTS.USER_LOGIN, result.id, { email });
         res.json({ token: result.token, fname: result.fname, id: result.id });
     } catch (e) { next(e); }
 };
