@@ -6,7 +6,8 @@ import {
     Button,
     Stack,
     Alert,
-    Snackbar
+    Snackbar,
+    CircularProgress
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../helpers/AuthContext';
@@ -20,6 +21,8 @@ function AuthLogin({ title, subtitle, subtext }) {
     const [alertMessage, setAlertMessage] = useState("");
     const [alertSeverity, setAlertSeverity] = useState("info");
     const [open, setOpen] = useState(false);
+    const [isSigningIn, setIsSigningIn] = useState(false);
+    const [isGuestLoading, setIsGuestLoading] = useState(false);
 
     const handleClose = () => {
         setOpen(false);
@@ -33,6 +36,7 @@ function AuthLogin({ title, subtitle, subtext }) {
             return;
         }
 
+        setIsSigningIn(true);
         const data = { email: email, password: password };
         api.post("/auth/login", data)
             .then((response) => {
@@ -58,10 +62,12 @@ function AuthLogin({ title, subtitle, subtext }) {
                     setAlertSeverity("error");
                 }
                 setOpen(true);
-            });
+            })
+            .finally(() => setIsSigningIn(false));
     };
 
     const ContinueAsGuest = async () => {
+        setIsGuestLoading(true);
         try {
             const response = await api.post("/auth/guest");
             localStorage.setItem("accessToken", response.data.token);
@@ -77,6 +83,7 @@ function AuthLogin({ title, subtitle, subtext }) {
             setAlertMessage("Failed to start guest session. Please try again.");
             setAlertSeverity("error");
             setOpen(true);
+            setIsGuestLoading(false);
         }
     };
 
@@ -117,8 +124,9 @@ function AuthLogin({ title, subtitle, subtext }) {
                     size="large"
                     fullWidth
                     onClick={Login}
+                    disabled={isSigningIn || isGuestLoading}
                 >
-                    Sign In
+                    {isSigningIn ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
                 </Button>
             </Box>
             <Box mt={2}>
@@ -128,8 +136,9 @@ function AuthLogin({ title, subtitle, subtext }) {
                     size="large"
                     fullWidth
                     onClick={ContinueAsGuest}
+                    disabled={isSigningIn || isGuestLoading}
                 >
-                    Continue as Guest
+                    {isGuestLoading ? <CircularProgress size={24} color="inherit" /> : "Continue as Guest"}
                 </Button>
             </Box>
             {subtitle}
