@@ -5,8 +5,12 @@ const create = async (userId, { amount, remark, CategoryId }) => {
     const exists = await Budgets.findOne({ where: { CategoryId } });
     if (exists) return { conflict: true };
 
-    await Budgets.create({ amount, remark, CategoryId, UserId: userId });
-    return { ok: true };
+    const created = await Budgets.create({ amount, remark, CategoryId, UserId: userId });
+    const budget = await Budgets.findOne({
+        where: { id: created.id },
+        include: [{ model: Categories, include: [{ model: Icons }] }],
+    });
+    return { ok: true, budget };
 };
 
 const getAll = async (userId) => {

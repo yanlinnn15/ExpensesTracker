@@ -58,22 +58,19 @@ const Categories = () => {
           .finally(() => setIsLoading(false));
       }, []);
 
-      const handleCateAdded = (newCate) => {
-        api.get('/cate/viewAll')
-        .then((response) => {
-            if (response.data) {
-              setCateIncome(response.data.cateincome);
-              setCateExpense(response.data.cateexpense);
-              showToast('Successful!');
-            }
-        })
-        .catch((error) => {
-            if (error.response) {
-                setErrorMsg(error.response.data.message);
-            } else {
-                setErrorMsg("Server Error");
-            }
-        });
+    const handleCateAdded = (newCate) => {
+        if (newCate.is_income) {
+            setCateIncome(prev => [...prev, newCate]);
+        } else {
+            setCateExpense(prev => [...prev, newCate]);
+        }
+        showToast('Successful!');
+    };
+
+    const handleCateUpdated = (updatedCate) => {
+        setCateIncome(prev => prev.map(c => c.id === updatedCate.id ? updatedCate : c));
+        setCateExpense(prev => prev.map(c => c.id === updatedCate.id ? updatedCate : c));
+        showToast('Updated successfully!');
     };
 
   const handleMenuOpen = (event, index, type) => {
@@ -437,11 +434,11 @@ const Categories = () => {
                 </Grid>
               </CardContent>
 
-              <EditCate 
-                  open={openEditModal} 
-                  onClose={() => setOpenEditModal(false)} 
-                  onCateAdded={handleCateAdded} 
-                  CateId={selectedCateId} 
+              <EditCate
+                  open={openEditModal}
+                  onClose={() => setOpenEditModal(false)}
+                  onCateAdded={handleCateUpdated}
+                  CateId={selectedCateId}
                   cate={selectedCate}
               />
 

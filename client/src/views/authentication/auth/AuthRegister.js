@@ -7,6 +7,7 @@ import { Stack } from '@mui/system';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { showsweetAlert } from '../../../helpers/alert';
+import logger from '../../../helpers/logger';
 
 function AuthRegister({ title, subtitle, subtext }) {
     const initialValues = { fname: "", lname: "", email: "", password: "" };
@@ -35,7 +36,7 @@ function AuthRegister({ title, subtitle, subtext }) {
                 }, 1500);
             })
             .catch((error) => {
-                console.error('Registration error:', error);
+                logger.error('Registration error:', error);
                 setAlertMessage("Server Error. Please try again later.");
             })
             .finally(() => {

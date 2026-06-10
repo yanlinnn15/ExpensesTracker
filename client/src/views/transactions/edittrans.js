@@ -80,7 +80,7 @@ function EditTrans({ open, onClose, onExpenseAdded, transactionId, transaction }
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data, { setSubmitting }) => {
-            api.patch(`/trans/edit/${transactionId}`, data)
+            return api.patch(`/trans/edit/${transactionId}`, data)
             .then((response) => {
                 const category = cate.find(c => c.id === data.CategoryId);
                 const transaction = {

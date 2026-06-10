@@ -7,6 +7,7 @@ import { isAuthenticated } from 'src/helpers/authCheck';
 import TransferCate from './transfercate';
 import { SuccessDialog } from '../Dialog/success';
 import { modalStyle as style } from 'src/helpers/modalStyle';
+import logger from 'src/helpers/logger';
 
 function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
     const navigate = useNavigate();
@@ -43,7 +44,7 @@ function DeleteCate({ open, onClose, onCateDeleted, CateId }) {
         const message = error.response 
             ? error.response.data.message || error.message 
             : error.message;
-        console.error("Error:", message);
+        logger.error("Error:", message);
         setDialogMessage(message);
         setDialogOpen(true);
     };

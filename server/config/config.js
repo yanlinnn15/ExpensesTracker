@@ -1,4 +1,5 @@
 require('dotenv').config();
+const logger = require('../utils/logger');
 
 module.exports = {
     development: {
@@ -8,6 +9,7 @@ module.exports = {
         host:     process.env.DB_HOST,
         port:     process.env.DB_PORT || 5432,
         dialect:  process.env.DB_DIALECT,
+        logging: false,
     },
     test: {
         username: process.env.DB_USERNAME,
@@ -16,6 +18,7 @@ module.exports = {
         host:     process.env.DB_HOST,
         port:     process.env.DB_PORT || 5432,
         dialect:  process.env.DB_DIALECT,
+        logging: false,
     },
     production: {
         use_env_variable: 'DB_URL',

@@ -5,6 +5,7 @@ import DashboardCard from '../../../components/shared/DashboardCard';
 import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
+import logger from 'src/helpers/logger';
 
 
 
@@ -28,7 +29,7 @@ const BudgetTracker = () => {
           }
         })
         .catch((error) => {
-          console.error('Budget fetch error:', error);
+          logger.error('Budget fetch error:', error);
         });
       }, []);
       

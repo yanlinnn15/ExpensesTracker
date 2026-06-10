@@ -5,6 +5,7 @@ import { AuthContext } from './helpers/AuthContext';
 import { useState, useEffect } from 'react';
 import api from './api';
 import { baselightTheme } from "./theme/DefaultColors";
+import logger from './helpers/logger';
 
 const App = () => {
   const [authState, setAuthState] = useState({ fname: "", id: 0, status: false });
@@ -33,7 +34,7 @@ const App = () => {
           }
         })
         .catch((error) => {
-          console.error("Error fetching auth status:", error);
+          logger.error("Error fetching auth status:", error);
           setError("Failed to authenticate. Please log in again.");
           setAuthState({ ...authState, status: false });
         })

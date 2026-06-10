@@ -7,6 +7,7 @@ import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 import { modalStyle as style } from 'src/helpers/modalStyle';
+import logger from 'src/helpers/logger';
 
 const validationSchema = Yup.object({
     amount: Yup.number()
@@ -38,7 +39,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
 
     const handleError = (error) => {
         const message = error.response ? error.response.data.message || error.message : error.message;
-        console.error("Error:", message);  
+        logger.error("Error:", message);
     };
 
     const formik = useFormik({
@@ -49,7 +50,7 @@ function EditBudget({ open, onClose, onBudgetAdded, Bid, budgets }) {
         validationSchema: validationSchema,
         enableReinitialize: true,
         onSubmit: (data, { setSubmitting }) => {
-            api.patch(`/budget/edit/${Bid}`, data)
+            return api.patch(`/budget/edit/${Bid}`, data)
             .then((response) => {
                 if (response.data) {
                     const updatedBudget = response.data;

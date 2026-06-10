@@ -65,23 +65,24 @@ function Budgets() {
     .finally(() => setIsLoading(false));
   }, []);
 
-  const handleBudgetAdded = (newCate) => {
-    api.get('/budget/viewAll')
-    .then((response) => {
-      if (response.data) {
-        setTtlBudget(
-          isNaN(parseFloat(response.data.totalBudget)) ? 0 : parseFloat(response.data.totalBudget).toFixed(2)
-        );
-        setTtlAmount(
-          isNaN(parseFloat(response.data.totalAmount)) ? 0 : parseFloat(response.data.totalAmount).toFixed(2)
-        );
-        setBudgetTrans(response.data.budgetTrans);
-        showToast('Successful!');
-      }
-    })
-    .catch((error) => {
-      setErrorMsg(error.message);
-    });
+  const handleBudgetAdded = (newBudget) => {
+    setBudgetTrans(prev => [...prev, newBudget]);
+    setTtlBudget(prev => (parseFloat(prev) + parseFloat(newBudget.amount)).toFixed(2));
+    showToast('Successful!');
+  };
+
+  const handleBudgetUpdated = (response) => {
+    const updated = response.budget;
+    if (!updated) return;
+    const oldBudget = budgetTrans.find(b => b.id === updated.id);
+    if (oldBudget) {
+      const diff = parseFloat(updated.amount) - parseFloat(oldBudget.amount);
+      setTtlBudget(prev => (parseFloat(prev) + diff).toFixed(2));
+    }
+    setBudgetTrans(prev => prev.map(b =>
+      b.id === updated.id ? { ...b, amount: updated.amount, remark: updated.remark } : b
+    ));
+    showToast('Updated successfully!');
   };
 
   const handleEditClick = (id, budget) => {
@@ -223,10 +224,10 @@ function Budgets() {
         onBudgetAdded={handleBudgetAdded} 
       />
 
-      <EditBudget 
-        open={openEditModal} 
-        onClose={() => setOpenEditModal(false)} 
-        onBudgetAdded={handleBudgetAdded} 
+      <EditBudget
+        open={openEditModal}
+        onClose={() => setOpenEditModal(false)}
+        onBudgetAdded={handleBudgetUpdated}
         Bid={selectedBudgetId}
         budgets={selectedBudget}
       />

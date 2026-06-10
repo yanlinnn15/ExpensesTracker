@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 import * as TablerIcons from "@tabler/icons-react";
 import { modalStyle } from 'src/helpers/modalStyle';
+import logger from 'src/helpers/logger';
 
 const style = { ...modalStyle, width: '80%', maxWidth: '600px' };
 
@@ -29,7 +30,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
 
         api.get(`/cate/someCate/${CateId}`)
         .then(response => setCategories(response.data))
-        .catch(error => console.error("Error fetching categories:", error));
+        .catch(error => logger.error("Error fetching categories:", error));
     }, [navigate]);
 
     const handleNextStep = async (newCategoryId) => {
@@ -53,7 +54,7 @@ function SelectTransCate({ open, onClose, CateId, onMigrationComplete, selectedT
         } catch (err) {
             setLoading(false);
             setError('An error occurred during the migration process');
-            console.error(err);
+            logger.error(err);
         }
     };
 

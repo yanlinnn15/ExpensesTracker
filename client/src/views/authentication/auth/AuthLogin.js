@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../helpers/AuthContext';
+import logger from '../../../helpers/logger';
 import CustomTextField from '../../../components/forms/theme-elements/CustomTextField';
 
 function AuthLogin({ title, subtitle, subtext }) {
@@ -41,6 +42,7 @@ function AuthLogin({ title, subtitle, subtext }) {
         api.post("/auth/login", data)
             .then((response) => {
                 if (response.data.token) {
+                    logger.info(`Login success: ${email}`);
                     localStorage.setItem("accessToken", response.data.token);
                     setAuthState({
                         fname: response.data.fname,
@@ -52,12 +54,15 @@ function AuthLogin({ title, subtitle, subtext }) {
             })
             .catch((error) => {
                 if (error.response) {
+                    logger.warn(`Login failed: ${error.response.data.message}`);
                     setAlertMessage(error.response.data.message);
                     setAlertSeverity("error");
                 } else if (error.request) {
+                    logger.error('Login - no response from server');
                     setAlertMessage("No response received from the server.");
                     setAlertSeverity("warning");
                 } else {
+                    logger.error('Login error:', error.message);
                     setAlertMessage("Error: " + error.message);
                     setAlertSeverity("error");
                 }
@@ -70,6 +75,7 @@ function AuthLogin({ title, subtitle, subtext }) {
         setIsGuestLoading(true);
         try {
             const response = await api.post("/auth/guest");
+            logger.info(`Guest session started: user ${response.data.id}`);
             localStorage.setItem("accessToken", response.data.token);
             localStorage.setItem("isGuest", "true");
             setAuthState({
@@ -80,6 +86,7 @@ function AuthLogin({ title, subtitle, subtext }) {
             });
             navigate('/');
         } catch (error) {
+            logger.error('Guest session failed:', error.message);
             setAlertMessage("Failed to start guest session. Please try again.");
             setAlertSeverity("error");
             setOpen(true);

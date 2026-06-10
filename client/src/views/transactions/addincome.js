@@ -8,6 +8,7 @@ import api from 'src/api';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from 'src/helpers/authCheck';
 import { modalStyle as style } from 'src/helpers/modalStyle';
+import logger from 'src/helpers/logger';
 
 const renderIcon = (iconName) => {
   const IconComponent = TablerIcons[iconName];
@@ -64,7 +65,7 @@ function AddIncome({ open, onClose, getIncomes }) {
   }, []);
 
   const onSubmit = (data, { setSubmitting }) => {
-    api.post("/trans/", data).then((response) => {
+    return api.post("/trans/", data).then((response) => {
         if (response.data && response.data.trans) {
             const category = cate.find(c => c.id === data.CategoryId);
             const transaction = {
@@ -78,7 +79,7 @@ function AddIncome({ open, onClose, getIncomes }) {
             onClose();
         }
     }).catch((error) => {
-        console.error("Error submitting income:", error);
+        logger.error("Error submitting income:", error);
         const message = error.response ? error.response.data.message : error.message;
         setDialogMessage(message);
         setDialogOpen(true);
