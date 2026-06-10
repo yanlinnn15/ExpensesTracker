@@ -64,26 +64,8 @@ function AddBudget({ open, onClose, onBudgetAdded }) {
         onSubmit: (data, { setSubmitting }) => {
             return api.post('/budget/', data)
             .then((response) => {
-                if (response.data) {
-                    const updatedBudget = {
-                        ...response.data,
-                        Icon: {
-                            icon_name: response.data.Category?.Icon.icon_name || 'IconHelp',
-                            icon_class: response.data.Category?.Icon.icon_class || 'IconHelp'
-                        },
-                        Category: {
-                            id: response.data.CategoryId,
-                            name: response.data.Category?.name || 'Unknown',
-                            is_income: response.data.Category?.is_income || false,
-                            IconId: response.data.Category?.IconId || null,
-                            Icon: {
-                                icon_name: response.data.Category?.Icon.icon_name || 'IconHelp',
-                                icon_class: response.data.Category?.Icon.icon_class || 'IconHelp'
-                            }
-                        },
-                        totalSpent: response.data.totalSpent || 0
-                    };
-                    onBudgetAdded(updatedBudget);
+                if (response.data?.budget) {
+                    onBudgetAdded({ ...response.data.budget, totalSpent: 0 });
                     formik.resetForm();
                     onClose();
                 } else {

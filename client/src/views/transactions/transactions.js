@@ -72,31 +72,58 @@ const Transactions = () => {
     };
 
     const handleExpenseAdded = (newTransaction) => {
+        const date = newTransaction.date.slice(0, 10);
         const yearMonth = newTransaction.date.slice(0, 7);
-        setSelectedDate(yearMonth);
+
+        if (yearMonth !== selectedDate) {
+            setSelectedDate(yearMonth); // useEffect will fetch that month
+            return;
+        }
+
+        // Optimistic insert — no API call needed, data is already in newTransaction
+        setTrans(prevTrans => {
+            const existing = prevTrans.find(day => day.date === date);
+            if (existing) {
+                return prevTrans.map(day =>
+                    day.date === date
+                        ? { ...day, transactions: [newTransaction, ...day.transactions] }
+                        : day
+                );
+            }
+            return [...prevTrans, { date, transactions: [newTransaction] }]
+                .sort((a, b) => b.date.localeCompare(a.date));
+        });
+
+        if (newTransaction.type === true) {
+            setTtlIncome(prev => (parseFloat(prev) + parseFloat(newTransaction.amount)).toFixed(2));
+        } else {
+            setTtlExpense(prev => (parseFloat(prev) + parseFloat(newTransaction.amount)).toFixed(2));
+        }
+    };
+
+    const handleTransactionUpdated = (updatedTransaction) => {
+        const yearMonth = updatedTransaction.date.slice(0, 7);
+        if (yearMonth !== selectedDate) {
+            setSelectedDate(yearMonth);
+            return;
+        }
+        // Re-fetch for edit — totals and date may have changed
         api.get(`/trans/viewAll?mth=${selectedDate}`)
         .then((response) => {
             if (response.data) {
                 const transactionsByDate = response.data.transaction.reduce((acc, tran) => {
                     const date = tran.date;
-                    if (!acc[date]) {
-                        acc[date] = { date, transactions: [] };
-                    }
+                    if (!acc[date]) acc[date] = { date, transactions: [] };
                     acc[date].transactions.push(tran);
                     return acc;
                 }, {});
-
                 setTrans(Object.values(transactionsByDate));
                 setTtlIncome(response.data.ttlIncome);
                 setTtlExpense(response.data.ttlExpense);
             }
         })
         .catch((error) => {
-            if (error.response) {
-                setErrorMsg(error.response.data.message);
-            } else {
-                setErrorMsg("Server Error");
-            }
+            setErrorMsg(error.response ? error.response.data.message : "Server Error");
         });
     };
 
@@ -162,11 +189,18 @@ const Transactions = () => {
 
     useEffect(() => {
         const mth = new URLSearchParams(location.search).get('mth');
+        if (mth) setSelectedDate(mth);
+    }, []);
 
-        if(mth)
-            setSelectedDate(mth);
-
-    }, [])
+    useEffect(() => {
+        const handleKey = (e) => {
+            const tag = e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+            if (e.key === 'n' || e.key === 'N') handleTransOpen();
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, []);
     
     useEffect(() => {
         if (!isAuthenticated()) {
@@ -396,11 +430,11 @@ const Transactions = () => {
                                         ))
                                     )}
                                 </TableBody>
-                                <EditTrans 
-                                    open={openEditModal} 
-                                    onClose={() => setOpenEditModal(false)} 
-                                    onExpenseAdded={handleExpenseAdded} 
-                                    transactionId={selectedTransactionId} 
+                                <EditTrans
+                                    open={openEditModal}
+                                    onClose={() => setOpenEditModal(false)}
+                                    onExpenseAdded={handleTransactionUpdated}
+                                    transactionId={selectedTransactionId}
                                     transaction={selectedTransac}
                                 />
 

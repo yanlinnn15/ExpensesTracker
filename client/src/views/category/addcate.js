@@ -65,15 +65,8 @@ function AddCate({ open, onClose, onCateAdded}) {
         onSubmit: (data, { setSubmitting }) => {
             return api.post('/cate/', data)
             .then((response) => {
-                if (response.data) {
-                    const updatedCategory = {
-                        ...response.data,
-                        Icon: {
-                            icon_name: data.name,
-                            icon_class: icon.find(c => c.id === data.IconId)?.icon_class || 'IconHelp'
-                        }
-                    };
-                    onCateAdded(updatedCategory);
+                if (response.data?.category) {
+                    onCateAdded(response.data.category);
                     formik.resetForm();
                     onClose();
                 } else {

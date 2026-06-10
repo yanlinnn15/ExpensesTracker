@@ -20,7 +20,7 @@ const create = async (req, res, next) => {
         const result = await budgetService.create(req.user.id, req.body);
         if (result.conflict) throw new AppError(400, 'Budget already created for this Category!');
         logEvent(EVENTS.BUDGET_CREATED, req.user.id, { categoryId: req.body.CategoryId, amount: req.body.amount });
-        res.status(201).json({ message: 'Budgets Created Successfully!' });
+        res.status(201).json({ message: 'Budgets Created Successfully!', budget: result.budget });
     } catch (e) { next(e); }
 };
 

@@ -17,9 +17,9 @@ const validate = (schema, data) => {
 const create = async (req, res, next) => {
     try {
         validate(CategoriesSchema, req.body);
-        await categoryService.create(req.user.id, req.body);
+        const category = await categoryService.create(req.user.id, req.body);
         logEvent(EVENTS.CATEGORY_CREATED, req.user.id, { name: req.body.name, is_income: req.body.is_income });
-        res.status(201).json({ message: 'Category Created Successfully!' });
+        res.status(201).json({ message: 'Category Created Successfully!', category });
     } catch (e) { next(e); }
 };
 

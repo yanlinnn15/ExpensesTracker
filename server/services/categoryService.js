@@ -2,7 +2,8 @@ const { Categories, Icons, Transactions, Budgets } = require('../models');
 const { Op } = require('sequelize');
 
 const create = async (userId, { name, IconId, is_income }) => {
-    return await Categories.create({ name, IconId, is_income, UserId: userId });
+    const category = await Categories.create({ name, IconId, is_income, UserId: userId });
+    return await Categories.findOne({ where: { id: category.id }, include: [{ model: Icons }] });
 };
 
 const update = async (id, userId, { name, IconId, is_income }) => {
