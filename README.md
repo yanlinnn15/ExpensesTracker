@@ -20,12 +20,13 @@ A full-stack web application for managing personal finances. Track income and ex
 
 ## Tech Stack
 
-| Layer     | Technology                              |
-|-----------|-----------------------------------------|
-| Frontend  | React 18, Vite, Material UI v5, ApexCharts |
-| Backend   | Node.js, Express                        |
-| Database  | PostgreSQL with Sequelize ORM           |
-| Auth      | JWT, bcrypt                             |
+| Layer     | Technology                                  |
+|-----------|---------------------------------------------|
+| Frontend  | React 18, Vite, Material UI v5, ApexCharts  |
+| Backend   | Node.js, Express                            |
+| Database  | PostgreSQL with Sequelize ORM               |
+| Auth      | JWT, bcrypt                                 |
+| DevOps    | Docker, Docker Compose                      |
 
 ---
 
@@ -72,20 +73,36 @@ When deleting a category that has transactions, you can transfer those transacti
 
 ## Getting Started
 
-### Prerequisites
+### Option A — Docker (Recommended)
 
-- Node.js v14+
-- PostgreSQL v13+
-- Git
+The easiest way to run the project locally. No need to install PostgreSQL or configure anything manually.
 
-### 1. Clone the repository
+**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+```bash
+git clone <repo-url>
+cd ExpensesTracker
+docker compose up
+```
+
+The app will be available at `http://localhost:5173`.
+
+That's it — Docker starts the database, backend, and frontend all at once.
+
+---
+
+### Option B — Manual Setup
+
+**Prerequisites:** Node.js v14+, PostgreSQL v13+
+
+#### 1. Clone the repository
 
 ```bash
 git clone <repo-url>
 cd ExpensesTracker
 ```
 
-### 2. Configure the server environment
+#### 2. Configure the server environment
 
 Create `server/.env`:
 
@@ -108,7 +125,7 @@ DB_PORT=5432
 DB_DIALECT=postgres
 ```
 
-### 3. Install dependencies
+#### 3. Install dependencies
 
 ```bash
 # Backend
@@ -120,14 +137,14 @@ cd ../client
 npm install
 ```
 
-### 4. Set up the database
+#### 4. Set up the database
 
 ```bash
 cd server
 npx sequelize-cli db:migrate
 ```
 
-### 5. Start the application
+#### 5. Start the application
 
 ```bash
 # Start the backend (from server/)
@@ -145,12 +162,13 @@ The app will be available at `http://localhost:5173`.
 
 ```
 ExpensesTracker/
-├── client/          # React frontend (Vite)
+├── docker-compose.yml   # Docker setup for all services
+├── client/              # React frontend (Vite)
 │   └── src/
-│       ├── views/   # Page components
+│       ├── views/       # Page components
 │       ├── components/
 │       └── helpers/
-└── server/          # Express backend
+└── server/              # Express backend
     ├── controllers/
     ├── models/
     ├── routes/
