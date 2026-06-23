@@ -24,7 +24,7 @@ export default defineConfig({
                     name: 'load-js-files-as-jsx',
                     setup(build) {
                         build.onLoad(
-                            { filter: /src\\.*\.js$/ },
+                            { filter: /src[/\\].*\.js$/ },
                             async (args) => ({
                                 loader: 'jsx',
                                 contents: await fs.readFile(args.path, 'utf8'),
@@ -43,4 +43,20 @@ export default defineConfig({
     // })],
 
     plugins: [svgr(), react()],
+
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: 'localhost',
+            port: 5173,
+        },
+        proxy: {
+            '/auth':   { target: 'http://server:3001', changeOrigin: true },
+            '/cate':   { target: 'http://server:3001', changeOrigin: true },
+            '/trans':  { target: 'http://server:3001', changeOrigin: true },
+            '/budget': { target: 'http://server:3001', changeOrigin: true },
+            '/icon':   { target: 'http://server:3001', changeOrigin: true },
+        },
+    },
 });
