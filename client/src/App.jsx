@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import api from './api';
 import { baselightTheme } from "./theme/DefaultColors";
 import logger from './helpers/logger';
+import { Analytics } from '@vercel/analytics/react';
 
 const App = () => {
   const [authState, setAuthState] = useState({ fname: "", id: 0, status: false });
@@ -54,6 +55,7 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {routing}
+        <Analytics />
       </ThemeProvider>
     </AuthContext.Provider>
   );
